@@ -176,13 +176,22 @@
             }
         }
 
-        function getUsers() { return JSON.parse(localStorage.getItem(DB_KEYS.USERS)); }
+        function getUsers() { 
+            const data = localStorage.getItem(DB_KEYS.USERS);
+            return data ? JSON.parse(data) : [{ username: 'admin', password: 'admin123', role: 'admin' }]; 
+        }
         function saveUsers(users) { localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)); }
         
-        function getFiles() { return JSON.parse(localStorage.getItem(DB_KEYS.FILES)); }
+        function getFiles() { 
+            const data = localStorage.getItem(DB_KEYS.FILES);
+            return data ? JSON.parse(data) : []; 
+        }
         function saveFiles(files) { localStorage.setItem(DB_KEYS.FILES, JSON.stringify(files)); }
 
-        function getSession() { return JSON.parse(localStorage.getItem(DB_KEYS.SESSION)); }
+        function getSession() { 
+            const data = localStorage.getItem(DB_KEYS.SESSION);
+            return data ? JSON.parse(data) : null; 
+        }
         function setSession(user) { localStorage.setItem(DB_KEYS.SESSION, JSON.stringify(user)); }
         function clearSession() { localStorage.removeItem(DB_KEYS.SESSION); }
 
@@ -270,7 +279,7 @@
             errorEl.textContent = '';
 
             const users = getUsers();
-            const user = users.find(u => u.username === username && u.password === password);
+            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
 
             if (!user) {
                 errorEl.textContent = 'Invalid username or password.';
@@ -317,25 +326,33 @@
             const reader = new FileReader();
 
             reader.onload = function(e) {
-                const files = getFiles();
+                try {
+                    const files = getFiles();
 
-                const newFile = {
-                    id: 'file_' + Date.now(),
-                    name: file.name,
-                    size: (file.size / (1024*1024)).toFixed(2) + ' MB',
-                    type: file.type,
-                    description: descInput.value || 'No description provided',
-                    dataUrl: e.target.result,
-                    allowDownload: false // Locked by default
-                };
+                    const newFile = {
+                        id: 'file_' + Date.now(),
+                        name: file.name,
+                        size: (file.size / (1024*1024)).toFixed(2) + ' MB',
+                        type: file.type || 'application/octet-stream',
+                        description: descInput.value || 'No description provided',
+                        dataUrl: e.target.result,
+                        allowDownload: false // Locked by default
+                    };
 
-                files.push(newFile);
-                saveFiles(files);
+                    files.push(newFile);
+                    saveFiles(files);
 
-                fileInput.value = '';
-                descInput.value = '';
-                successEl.textContent = 'File uploaded successfully!';
-                renderAdminFiles();
+                    fileInput.value = '';
+                    descInput.value = '';
+                    successEl.textContent = 'File uploaded successfully!';
+                    renderAdminFiles();
+                } catch (err) {
+                    errorEl.textContent = 'Upload failed (file might be too large for browser storage).';
+                }
+            };
+
+            reader.onerror = function() {
+                errorEl.textContent = 'Failed to read the selected file.';
             };
 
             reader.readAsDataURL(file);
