@@ -4,6 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daniel's Resource Hub</title>
+    <!-- Firebase App (Core), Auth, Firestore & Storage SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+        // TODO: Replace with your project's official Firebase configuration credentials
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Expose Firebase tools globally for the app UI handlers
+        window.firebaseApp = { auth, db, storage, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, query, where, ref, uploadBytesResumable, getDownloadURL, deleteObject };
+        window.dispatchEvent(new Event('firebase-loaded'));
+    </script>
+
     <style>
         :root {
             --primary: #2563eb;
@@ -20,7 +47,6 @@
         header p { opacity: 0.9; }
         
         .container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
-        
         .card { background: var(--card-bg); border-radius: 10px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); padding: 2rem; margin-bottom: 2rem; }
         
         .auth-container, .dashboard, .admin-panel { display: none; }
@@ -62,13 +88,16 @@
         .auth-switch { text-align: center; margin-top: 1rem; font-size: 0.9rem; }
         .auth-switch a { color: var(--primary); text-decoration: none; font-weight: 600; cursor: pointer; }
         .auth-switch a:hover { text-decoration: underline; }
+        
+        .progress-bar-container { width: 100%; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 0.5rem; display: none; }
+        .progress-bar { width: 0%; height: 8px; background: var(--primary); transition: width 0.2s; }
     </style>
 </head>
 <body>
 
     <header>
         <h1>Daniel's Resource Hub</h1>
-        <p>Official Notes, Images, Audio & Video Repository</p>
+        <p>Large File Notes, Images, Audio & Video Repository</p>
     </header>
 
     <div class="container">
@@ -85,12 +114,12 @@
             <!-- Login Form -->
             <div id="loginFormSection">
                 <h2>User Login</h2>
-                <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Please log in with your username and password to view Daniel's resources.</p>
+                <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Please log in with your email and password.</p>
                 <div id="loginError" class="error-msg"></div>
                 
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" id="loginUsername" placeholder="Enter your username">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="Enter your email">
                 </div>
                 <div class="form-group">
                     <label>Password</label>
@@ -105,16 +134,16 @@
             <!-- Register Form -->
             <div id="registerFormSection" style="display: none;">
                 <h2>Create an Account</h2>
-                <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Set up your username and password to access the hub.</p>
+                <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Register an email and password to access the hub.</p>
                 <div id="registerError" class="error-msg"></div>
                 <div id="registerSuccess" class="success-msg"></div>
                 
                 <div class="form-group">
-                    <label>Choose Username</label>
-                    <input type="text" id="regUsername" placeholder="Choose a unique username">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" placeholder="Enter your email">
                 </div>
                 <div class="form-group">
-                    <label>Choose Password</label>
+                    <label>Password (min 6 chars)</label>
                     <input type="password" id="regPassword" placeholder="Set a secure password">
                 </div>
                 <button onclick="registerUser()" class="btn-success">Register Account</button>
@@ -124,46 +153,52 @@
             </div>
         </div>
 
-        <!-- REGULAR USER DASHBOARD VIEW (View, Read, Open & Upload for Approval) -->
+        <!-- REGULAR USER DASHBOARD VIEW -->
         <div id="userDashboard" class="card dashboard">
             <h2>Daniel's Official Uploads</h2>
-            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Browse materials shared by Daniel. You can open/read documents, view previews, and download if permitted.</p>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Browse materials shared by Daniel. Open or read documents directly.</p>
             <div id="userFileList" class="file-grid"></div>
 
-            <h2 style="margin-top: 2.5rem;">Contribute / Upload Material</h2>
-            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Submit a file for Daniel (Admin) to review and approve.</p>
+            <h2 style="margin-top: 2.5rem;">Contribute / Upload Large Material</h2>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Submit a large file (Videos, PDFs, Audio) for Daniel (Admin) to review and approve.</p>
             <div id="userUploadError" class="error-msg"></div>
             <div id="userUploadSuccess" class="success-msg"></div>
 
             <div class="form-group">
-                <label>Select File (Notes, PDFs, Images, Videos, Audio)</label>
+                <label>Select File</label>
                 <input type="file" id="userFileInput">
             </div>
             <div class="form-group">
                 <label>Description / Title</label>
-                <input type="text" id="userFileDescription" placeholder="e.g., My Revision Notes">
+                <input type="text" id="userFileDescription" placeholder="e.g., Semester 2 Lecture Video">
             </div>
-            <button onclick="userUploadFile()" class="btn-success">Submit for Admin Approval</button>
+            <div class="progress-bar-container" id="userProgressContainer">
+                <div class="progress-bar" id="userProgressBar"></div>
+            </div>
+            <button onclick="userUploadFile()" class="btn-success" style="margin-top: 1rem;">Submit for Admin Approval</button>
 
             <h2 style="margin-top: 2.5rem;">My Submitted Uploads</h2>
             <div id="mySubmittedList" class="file-grid"></div>
         </div>
 
-        <!-- ADMIN DASHBOARD VIEW (Upload, Moderate & Control) -->
+        <!-- ADMIN DASHBOARD VIEW -->
         <div id="adminDashboard" class="card admin-panel">
             <h2>Admin Upload & Control Panel</h2>
             <div id="uploadError" class="error-msg"></div>
             <div id="uploadSuccess" class="success-msg"></div>
             
             <div class="form-group">
-                <label>Upload File (Notes/PDFs, Images, Videos, Audio)</label>
+                <label>Upload Large File (Videos, Books, Notes)</label>
                 <input type="file" id="fileInput">
             </div>
             <div class="form-group">
                 <label>Description / Title</label>
-                <input type="text" id="fileDescription" placeholder="e.g., Physics Lesson 1 Audio / Mathematics Notes">
+                <input type="text" id="fileDescription" placeholder="e.g., Advanced Mathematics Video Lecture">
             </div>
-            <button onclick="adminUploadFile()">Upload File</button>
+            <div class="progress-bar-container" id="adminProgressContainer">
+                <div class="progress-bar" id="adminProgressBar"></div>
+            </div>
+            <button onclick="adminUploadFile()" style="margin-top: 1rem;">Upload File</button>
 
             <h2 style="margin-top: 2.5rem;">User Submissions Awaiting Approval</h2>
             <div id="adminPendingList" class="file-grid"></div>
@@ -193,40 +228,23 @@
     </div>
 
     <script>
-        const DB_KEYS = {
-            USERS: 'hub_users',
-            FILES: 'hub_files',
-            SESSION: 'hub_session'
-        };
+        let currentUserSession = null;
 
-        function initDB() {
-            if (!localStorage.getItem(DB_KEYS.USERS)) {
-                const defaultUsers = [{ username: 'admin', password: 'admin123', role: 'admin' }];
-                localStorage.setItem(DB_KEYS.USERS, JSON.stringify(defaultUsers));
-            }
-            if (!localStorage.getItem(DB_KEYS.FILES)) {
-                localStorage.setItem(DB_KEYS.FILES, JSON.stringify([]));
-            }
-        }
+        window.addEventListener('firebase-loaded', () => {
+            const { auth, onAuthStateChanged, db, collection, getDocs, query, where } = window.firebaseApp;
 
-        function getUsers() { 
-            const data = localStorage.getItem(DB_KEYS.USERS);
-            return data ? JSON.parse(data) : [{ username: 'admin', password: 'admin123', role: 'admin' }]; 
-        }
-        function saveUsers(users) { localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)); }
-        
-        function getFiles() { 
-            const data = localStorage.getItem(DB_KEYS.FILES);
-            return data ? JSON.parse(data) : []; 
-        }
-        function saveFiles(files) { localStorage.setItem(DB_KEYS.FILES, JSON.stringify(files)); }
-
-        function getSession() { 
-            const data = localStorage.getItem(DB_KEYS.SESSION);
-            return data ? JSON.parse(data) : null; 
-        }
-        function setSession(user) { localStorage.setItem(DB_KEYS.SESSION, JSON.stringify(user)); }
-        function clearSession() { localStorage.removeItem(DB_KEYS.SESSION); }
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    // Check user role (admin email can be configured here)
+                    const role = (user.email === 'daniebandari@gmail.com' || user.email === 'admin@hub.com') ? 'admin' : 'user';
+                    currentUserSession = { uid: user.uid, email: user.email, role: role };
+                    updateView();
+                } else {
+                    currentUserSession = null;
+                    updateView();
+                }
+            });
+        });
 
         function switchAuthMode(mode) {
             const loginSec = document.getElementById('loginFormSection');
@@ -244,9 +262,7 @@
             }
         }
 
-        function updateView() {
-            initDB();
-            const session = getSession();
+        async function updateView() {
             const authView = document.getElementById('authView');
             const userDashboard = document.getElementById('userDashboard');
             const adminDashboard = document.getElementById('adminDashboard');
@@ -257,409 +273,328 @@
             adminDashboard.classList.remove('active-view');
             sessionBar.style.display = 'none';
 
-            if (!session) {
+            if (!currentUserSession) {
                 authView.classList.add('active-view');
             } else {
                 sessionBar.style.display = 'flex';
-                document.getElementById('currentUsername').textContent = session.username;
-                document.getElementById('currentUserRole').textContent = session.role === 'admin' ? 'ADMIN (YOU)' : 'USER';
+                document.getElementById('currentUsername').textContent = currentUserSession.email;
+                document.getElementById('currentUserRole').textContent = currentUserSession.role === 'admin' ? 'ADMIN (YOU)' : 'USER';
 
-                if (session.role === 'admin') {
+                if (currentUserSession.role === 'admin') {
                     adminDashboard.classList.add('active-view');
-                    renderAdminFiles();
-                    renderAdminPending();
+                    await renderAdminFiles();
+                    await renderAdminPending();
                 } else {
                     userDashboard.classList.add('active-view');
-                    renderUserFiles();
-                    renderUserMySubmissions();
+                    await renderUserFiles();
+                    await renderUserMySubmissions();
                 }
             }
         }
 
-        function registerUser() {
-            const username = document.getElementById('regUsername').value.trim();
+        async function registerUser() {
+            const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value.trim();
             const errorEl = document.getElementById('registerError');
             const successEl = document.getElementById('registerSuccess');
             errorEl.textContent = '';
             successEl.textContent = '';
 
-            if (!username || !password) {
-                errorEl.textContent = 'Please fill in both username and password.';
-                return;
+            try {
+                const { auth, createUserWithEmailAndPassword } = window.firebaseApp;
+                await createUserWithEmailAndPassword(auth, email, password);
+                successEl.textContent = 'Account created successfully! Logging in...';
+            } catch (err) {
+                errorEl.textContent = err.message;
             }
-
-            const users = getUsers();
-            if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
-                errorEl.textContent = 'Username already exists. Please choose another.';
-                return;
-            }
-
-            users.push({ username, password, role: 'user' });
-            saveUsers(users);
-
-            successEl.textContent = 'Account created successfully! You can now log in.';
-            document.getElementById('regUsername').value = '';
-            document.getElementById('regPassword').value = '';
-
-            setTimeout(() => {
-                switchAuthMode('login');
-            }, 1500);
         }
 
-        function login() {
-            const username = document.getElementById('loginUsername').value.trim();
+        async function login() {
+            const email = document.getElementById('loginEmail').value.trim();
             const password = document.getElementById('loginPassword').value.trim();
             const errorEl = document.getElementById('loginError');
             errorEl.textContent = '';
 
-            const users = getUsers();
-            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase() && u.password === password);
-
-            if (!user) {
-                errorEl.textContent = 'Invalid username or password.';
-                return;
+            try {
+                const { auth, signInWithEmailAndPassword } = window.firebaseApp;
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (err) {
+                errorEl.textContent = 'Invalid email or password.';
             }
-
-            setSession(user);
-            document.getElementById('loginUsername').value = '';
-            document.getElementById('loginPassword').value = '';
-            updateView();
         }
 
-        function logout() {
-            clearSession();
-            updateView();
+        async function logout() {
+            const { auth, signOut } = window.firebaseApp;
+            await signOut(auth);
         }
 
         function getFileMeta(type, name) {
             const lowerName = name ? name.toLowerCase() : '';
-            if (type.startsWith('image/')) {
-                return { icon: '🖼️', label: 'Image', tag: 'image' };
-            } else if (type.startsWith('video/')) {
-                return { icon: '🎬', label: 'Video', tag: 'video' };
-            } else if (type.startsWith('audio/')) {
-                return { icon: '🎵', label: 'Audio', tag: 'audio' };
-            } else if (type.includes('pdf') || lowerName.endsWith('.pdf')) {
-                return { icon: '📄', label: 'PDF Document', tag: 'pdf' };
-            } else if (type.includes('text') || lowerName.endsWith('.txt') || lowerName.endsWith('.md')) {
-                return { icon: '📝', label: 'Text Document', tag: 'text' };
-            } else {
-                return { icon: '📁', label: 'Document / File', tag: 'doc' };
-            }
+            if (type.startsWith('image/')) return { icon: '🖼️', label: 'Image', tag: 'image' };
+            if (type.startsWith('video/')) return { icon: '🎬', label: 'Video', tag: 'video' };
+            if (type.startsWith('audio/')) return { icon: '🎵', label: 'Audio', tag: 'audio' };
+            if (type.includes('pdf') || lowerName.endsWith('.pdf')) return { icon: '📄', label: 'PDF Document', tag: 'pdf' };
+            if (type.includes('text') || lowerName.endsWith('.txt') || lowerName.endsWith('.md')) return { icon: '📝', label: 'Text Document', tag: 'text' };
+            return { icon: '📁', label: 'Document / File', tag: 'doc' };
         }
 
-        // Admin direct upload
-        function adminUploadFile() {
-            const fileInput = document.getElementById('fileInput');
-            const descInput = document.getElementById('fileDescription');
-            const errorEl = document.getElementById('uploadError');
-            const successEl = document.getElementById('uploadSuccess');
+        // Shared function to handle Firebase Storage upload with progress bar
+        async function uploadFileToFirebase(fileInputId, descInputId, progressBarId, progressContainerId, statusVal, successMsg, errorElId) {
+            const fileInput = document.getElementById(fileInputId);
+            const descInput = document.getElementById(descInputId);
+            const errorEl = document.getElementById(errorElId);
+            const progressBar = document.getElementById(progressBarId);
+            const progressContainer = document.getElementById(progressContainerId);
             errorEl.textContent = '';
-            successEl.textContent = '';
 
             if (fileInput.files.length === 0) {
-                errorEl.textContent = 'Please select a file to upload.';
+                errorEl.textContent = 'Please select a file first.';
                 return;
             }
 
             const file = fileInput.files[0];
-            const reader = new FileReader();
+            const { storage, ref, uploadBytesResumable, getDownloadURL, db, collection, addDoc } = window.firebaseApp;
 
-            reader.onload = function(e) {
-                try {
-                    const files = getFiles();
-                    const newFile = {
-                        id: 'file_' + Date.now(),
-                        name: file.name,
-                        size: (file.size / (1024*1024)).toFixed(2) + ' MB',
-                        type: file.type || 'application/octet-stream',
-                        description: descInput.value || 'No description provided',
-                        dataUrl: e.target.result,
-                        allowDownload: false,
-                        status: 'approved', // Admin uploads are approved automatically
-                        uploader: 'admin'
-                    };
+            const storageRef = ref(storage, 'hub_files/' + Date.now() + '_' + file.name);
+            const uploadTask = uploadBytesResumable(storageRef, file);
 
-                    files.push(newFile);
-                    saveFiles(files);
+            progressContainer.style.display = 'block';
 
-                    fileInput.value = '';
-                    descInput.value = '';
-                    successEl.textContent = 'File uploaded successfully!';
-                    renderAdminFiles();
-                } catch (err) {
-                    errorEl.textContent = 'Upload failed (file might be too large).';
+            uploadTask.on('state_changed', 
+                (snapshot) => {
+                    const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                    progressBar.style.width = progress + '%';
+                }, 
+                (error) => {
+                    progressContainer.style.display = 'none';
+                    errorEl.textContent = 'Upload failed: ' + error.message;
+                }, 
+                async () => {
+                    try {
+                        const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+                        
+                        // Save metadata to Firestore database
+                        await addDoc(collection(db, 'files'), {
+                            name: file.name,
+                            size: (file.size / (1024*1024)).toFixed(2) + ' MB',
+                            type: file.type || 'application/octet-stream',
+                            description: descInput.value || 'No description provided',
+                            fileUrl: downloadURL,
+                            allowDownload: false,
+                            status: statusVal,
+                            uploader: currentUserSession.email,
+                            createdAt: Date.now()
+                        });
+
+                        progressContainer.style.display = 'none';
+                        progressBar.style.width = '0%';
+                        fileInput.value = '';
+                        descInput.value = '';
+                        
+                        if(statusVal === 'approved') {
+                            document.getElementById('uploadSuccess').textContent = successMsg;
+                            await renderAdminFiles();
+                        } else {
+                            document.getElementById('userUploadSuccess').textContent = successMsg;
+                            await renderUserMySubmissions();
+                        }
+                    } catch(err) {
+                        errorEl.textContent = 'Failed saving record: ' + err.message;
+                    }
                 }
-            };
-            reader.readAsDataURL(file);
+            );
         }
 
-        // User submit file for approval
-        function userUploadFile() {
-            const fileInput = document.getElementById('userFileInput');
-            const descInput = document.getElementById('userFileDescription');
-            const errorEl = document.getElementById('userUploadError');
-            const successEl = document.getElementById('userUploadSuccess');
-            errorEl.textContent = '';
-            successEl.textContent = '';
-
-            if (fileInput.files.length === 0) {
-                errorEl.textContent = 'Please select a file to submit.';
-                return;
-            }
-
-            const session = getSession();
-            const file = fileInput.files[0];
-            const reader = new FileReader();
-
-            reader.onload = function(e) {
-                try {
-                    const files = getFiles();
-                    const newFile = {
-                        id: 'file_' + Date.now(),
-                        name: file.name,
-                        size: (file.size / (1024*1024)).toFixed(2) + ' MB',
-                        type: file.type || 'application/octet-stream',
-                        description: descInput.value || 'No description provided',
-                        dataUrl: e.target.result,
-                        allowDownload: false,
-                        status: 'pending', // Awaiting admin approval
-                        uploader: session.username
-                    };
-
-                    files.push(newFile);
-                    saveFiles(files);
-
-                    fileInput.value = '';
-                    descInput.value = '';
-                    successEl.textContent = 'File submitted successfully! Waiting for admin review.';
-                    renderUserMySubmissions();
-                } catch (err) {
-                    errorEl.textContent = 'Submission failed (file might be too large).';
-                }
-            };
-            reader.readAsDataURL(file);
+        async function adminUploadFile() {
+            await uploadFileToFirebase('fileInput', 'fileDescription', 'adminProgressBar', 'adminProgressContainer', 'approved', 'File uploaded successfully!', 'uploadError');
         }
 
-        // Render files for regular users (Only approved files)
-        function renderUserFiles() {
-            const files = getFiles().filter(f => f.status === 'approved');
+        async function userUploadFile() {
+            await uploadFileToFirebase('userFileInput', 'userFileDescription', 'userProgressBar', 'userProgressContainer', 'pending', 'File submitted successfully! Waiting for admin approval.', 'userUploadError');
+        }
+
+        async function renderUserFiles() {
+            const { db, collection, getDocs, query, where } = window.firebaseApp;
+            const q = query(collection(db, 'files'), where("status", "==", "approved"));
+            const querySnapshot = await getDocs(q);
+            
             const container = document.getElementById('userFileList');
             container.innerHTML = '';
 
-            if (files.length === 0) {
+            if (querySnapshot.empty) {
                 container.innerHTML = '<p style="color: #64748b;">Daniel has not uploaded any files yet. Check back soon!</p>';
                 return;
             }
 
-            files.forEach(file => {
-                const card = document.createElement('div');
-                card.className = 'file-card';
-                const meta = getFileMeta(file.type, file.name);
+            querySnapshot.forEach((docSnap) => {
+                const file = docSnap.id;
+                const data = docSnap.data();
+                const meta = getFileMeta(data.type, data.name);
 
                 let previewHtml = '';
-                if (meta.tag === 'image') {
-                    previewHtml = `<div class="preview-container"><img src="${file.dataUrl}" alt="${file.name}"></div>`;
-                } else if (meta.tag === 'video') {
-                    previewHtml = `<div class="preview-container"><video controls src="${file.dataUrl}"></video></div>`;
-                } else if (meta.tag === 'audio') {
-                    previewHtml = `<div class="preview-container" style="background:#f1f5f9; padding: 10px;"><audio controls src="${file.dataUrl}" style="width:100%"></audio></div>`;
-                }
+                if (meta.tag === 'image') previewHtml = `<div class="preview-container"><img src="${data.fileUrl}" alt="${data.name}"></div>`;
+                else if (meta.tag === 'video') previewHtml = `<div class="preview-container"><video controls src="${data.fileUrl}"></video></div>`;
+                else if (meta.tag === 'audio') previewHtml = `<div class="preview-container" style="background:#f1f5f9; padding: 10px;"><audio controls src="${data.fileUrl}" style="width:100%"></audio></div>`;
 
-                let readButton = `<button onclick="openReader('${file.id}')" style="margin-top:0.8rem; padding:0.4rem 0.8rem; font-size:0.9rem; width:auto;">Open & Read / View</button>`;
+                let readButton = `<button onclick='openReader(${JSON.stringify(data.fileUrl)}, ${JSON.stringify(data.name)}, ${JSON.stringify(data.type)})' style="margin-top:0.8rem; padding:0.4rem 0.8rem; font-size:0.9rem; width:auto;">Open & Read / View</button>`;
+                let downloadAction = data.allowDownload 
+                    ? `<a href="${data.fileUrl}" download="${data.name}" target="_blank" style="display:inline-block; margin-top:0.8rem; background:#16a34a; color:#fff; padding:0.4rem 0.8rem; text-decoration:none; border-radius:4px; font-size:0.9rem;">Download File</a>`
+                    : `<p style="margin-top:0.8rem; color:#dc2626; font-size:0.85rem;">🔒 Download locked. Contact Daniel for permission.</p>`;
 
-                let downloadAction = '';
-                if (file.allowDownload) {
-                    downloadAction = `<a href="${file.dataUrl}" download="${file.name}" style="display:inline-block; margin-top:0.8rem; background:#16a34a; color:#fff; padding:0.4rem 0.8rem; text-decoration:none; border-radius:4px; font-size:0.9rem;">Download File</a>`;
-                } else {
-                    downloadAction = `<p style="margin-top:0.8rem; color:#dc2626; font-size:0.85rem;">🔒 Download locked. Contact Daniel for permission.</p>`;
-                }
-
+                const card = document.createElement('div');
+                card.className = 'file-card';
                 card.innerHTML = `
-                    <h4><span>${meta.icon}</span> ${file.name}</h4>
-                    <p><strong>Type:</strong> ${meta.label}</p>
-                    <p><strong>Description:</strong> ${file.description}</p>
-                    <p><strong>Shared by:</strong> ${file.uploader === 'admin' ? 'Daniel (Admin)' : file.uploader}</p>
+                    <h4><span>${meta.icon}</span> ${data.name}</h4>
+                    <p><strong>Type:</strong> ${meta.label} (${data.size})</p>
+                    <p><strong>Description:</strong> ${data.description}</p>
+                    <p><strong>Shared by:</strong> ${data.uploader === 'daniebandari@gmail.com' ? 'Daniel (Admin)' : data.uploader}</p>
                     ${previewHtml}
-                    <div style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;">
-                        ${readButton}
-                    </div>
+                    <div>${readButton}</div>
                     ${downloadAction}
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Render user's own submissions
-        function renderUserMySubmissions() {
-            const session = getSession();
-            const files = getFiles().filter(f => f.uploader === session.username);
+        async function renderUserMySubmissions() {
+            const { db, collection, getDocs, query, where } = window.firebaseApp;
+            const q = query(collection(db, 'files'), where("uploader", "==", currentUserSession.email));
+            const querySnapshot = await getDocs(q);
+            
             const container = document.getElementById('mySubmittedList');
             container.innerHTML = '';
 
-            if (files.length === 0) {
+            if (querySnapshot.empty) {
                 container.innerHTML = '<p style="color: #64748b;">You have not submitted any files yet.</p>';
                 return;
             }
 
-            files.forEach(file => {
+            querySnapshot.forEach((docSnap) => {
+                const data = docSnap.data();
+                const meta = getFileMeta(data.type, data.name);
+                let statusBadge = data.status === 'approved' ? '<span class="badge badge-approved">Approved</span>' : (data.status === 'rejected' ? '<span class="badge badge-rejected">Rejected</span>' : '<span class="badge badge-pending">Pending Approval</span>');
+
                 const card = document.createElement('div');
                 card.className = 'file-card';
-                const meta = getFileMeta(file.type, file.name);
-
-                let statusBadge = '';
-                if (file.status === 'approved') statusBadge = '<span class="badge badge-approved">Approved by Admin</span>';
-                else if (file.status === 'rejected') statusBadge = '<span class="badge badge-rejected">Rejected</span>';
-                else statusBadge = '<span class="badge badge-pending">Pending Approval</span>';
-
                 card.innerHTML = `
-                    <h4><span>${meta.icon}</span> ${file.name}</h4>
-                    <p><strong>Description:</strong> ${file.description}</p>
+                    <h4><span>${meta.icon}</span> ${data.name}</h4>
+                    <p><strong>Description:</strong> ${data.description}</p>
                     <p><strong>Status:</strong> ${statusBadge}</p>
-                    <button onclick="openReader('${file.id}')" style="margin-top:0.8rem; padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">View File</button>
+                    <button onclick='openReader(${JSON.stringify(data.fileUrl)}, ${JSON.stringify(data.name)}, ${JSON.stringify(data.type)})' style="margin-top:0.8rem; padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">View File</button>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Admin: Render pending user submissions
-        function renderAdminPending() {
-            const files = getFiles().filter(f => f.status === 'pending');
+        async function renderAdminPending() {
+            const { db, collection, getDocs, query, where } = window.firebaseApp;
+            const q = query(collection(db, 'files'), where("status", "==", "pending"));
+            const querySnapshot = await getDocs(q);
+            
             const container = document.getElementById('adminPendingList');
             container.innerHTML = '';
 
-            if (files.length === 0) {
+            if (querySnapshot.empty) {
                 container.innerHTML = '<p style="color: #64748b;">No pending user submissions.</p>';
                 return;
             }
 
-            files.forEach(file => {
+            querySnapshot.forEach((docSnap) => {
+                const id = docSnap.id;
+                const data = docSnap.data();
+                const meta = getFileMeta(data.type, data.name);
+
                 const card = document.createElement('div');
                 card.className = 'file-card';
-                const meta = getFileMeta(file.type, file.name);
-
                 card.innerHTML = `
-                    <h4><span>${meta.icon}</span> ${file.name}</h4>
-                    <p><strong>Submitted by:</strong> ${file.uploader}</p>
-                    <p><strong>Description:</strong> ${file.description}</p>
-                    <p><strong>Size:</strong> ${file.size}</p>
+                    <h4><span>${meta.icon}</span> ${data.name}</h4>
+                    <p><strong>Submitted by:</strong> ${data.uploader}</p>
+                    <p><strong>Description:</strong> ${data.description}</p>
+                    <p><strong>Size:</strong> ${data.size}</p>
                     <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        <button onclick="openReader('${file.id}')" style="background:#2563eb; padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Read / View</button>
-                        <button onclick="adminApproveFile('${file.id}')" class="btn-success" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Approve</button>
-                        <button onclick="adminRejectFile('${file.id}')" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Decline</button>
+                        <button onclick='openReader(${JSON.stringify(data.fileUrl)}, ${JSON.stringify(data.name)}, ${JSON.stringify(data.type)})' style="background:#2563eb; padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Read / View</button>
+                        <button onclick="adminUpdateStatus('${id}', 'approved')" class="btn-success" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Approve</button>
+                        <button onclick="adminUpdateStatus('${id}', 'rejected')" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Decline</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Admin: Render all approved/managed files
-        function renderAdminFiles() {
-            const files = getFiles().filter(f => f.status === 'approved');
+        async function renderAdminFiles() {
+            const { db, collection, getDocs, query, where } = window.firebaseApp;
+            const q = query(collection(db, 'files'), where("status", "==", "approved"));
+            const querySnapshot = await getDocs(q);
+            
             const container = document.getElementById('adminFileList');
             container.innerHTML = '';
 
-            if (files.length === 0) {
+            if (querySnapshot.empty) {
                 container.innerHTML = '<p style="color: #64748b;">No approved hub files yet.</p>';
                 return;
             }
 
-            files.forEach(file => {
+            querySnapshot.forEach((docSnap) => {
+                const id = docSnap.id;
+                const data = docSnap.data();
+                const meta = getFileMeta(data.type, data.name);
+                let permissionBadge = data.allowDownload ? '<span class="badge badge-approved">Download Permitted</span>' : '<span class="badge badge-rejected">Download Restricted</span>';
+
                 const card = document.createElement('div');
                 card.className = 'file-card';
-                const meta = getFileMeta(file.type, file.name);
-
-                let permissionBadge = file.allowDownload 
-                    ? '<span class="badge badge-approved">Download Permitted</span>' 
-                    : '<span class="badge badge-danger" style="background:#fef2f2; color:#dc2626; padding:0.25rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:700;">Download Restricted</span>';
-
                 card.innerHTML = `
-                    <h4><span>${meta.icon}</span> ${file.name}</h4>
-                    <p><strong>Type:</strong> ${meta.label}</p>
-                    <p><strong>Description:</strong> ${file.description}</p>
-                    <p><strong>Uploader:</strong> ${file.uploader}</p>
+                    <h4><span>${meta.icon}</span> ${data.name}</h4>
+                    <p><strong>Type:</strong> ${meta.label} (${data.size})</p>
+                    <p><strong>Description:</strong> ${data.description}</p>
+                    <p><strong>Uploader:</strong> ${data.uploader}</p>
                     <p><strong>Status:</strong> ${permissionBadge}</p>
                     <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        <button onclick="openReader('${file.id}')" style="background:#2563eb; padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Read / View</button>
-                        ${!file.allowDownload ? `<button onclick="adminToggleDownload('${file.id}', true)" class="btn-success" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Allow Download</button>` : `<button onclick="adminToggleDownload('${file.id}', false)" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Revoke Download</button>`}
-                        <button onclick="adminDelete('${file.id}')" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Delete</button>
+                        <button onclick='openReader(${JSON.stringify(data.fileUrl)}, ${JSON.stringify(data.name)}, ${JSON.stringify(data.type)})' style="background:#2563eb; padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Read / View</button>
+                        ${!data.allowDownload ? `<button onclick="adminToggleDownload('${id}', true)" class="btn-success" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Allow Download</button>` : `<button onclick="adminToggleDownload('${id}', false)" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Revoke Download</button>`}
+                        <button onclick="adminDelete('${id}')" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Delete</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        function adminApproveFile(fileId) {
-            const files = getFiles();
-            const file = files.find(f => f.id === fileId);
-            if (file) {
-                file.status = 'approved';
-                saveFiles(files);
-                updateView();
-            }
+        async function adminUpdateStatus(fileId, status) {
+            const { db, doc, updateDoc } = window.firebaseApp;
+            await updateDoc(doc(db, 'files', fileId), { status: status });
+            await updateView();
         }
 
-        function adminRejectFile(fileId) {
-            const files = getFiles();
-            const file = files.find(f => f.id === fileId);
-            if (file) {
-                file.status = 'rejected';
-                saveFiles(files);
-                updateView();
-            }
+        async function adminToggleDownload(fileId, allow) {
+            const { db, doc, updateDoc } = window.firebaseApp;
+            await updateDoc(doc(db, 'files', fileId), { allowDownload: allow });
+            if (currentUserSession.role === 'admin') await renderAdminFiles();
         }
 
-        function adminToggleDownload(fileId, allow) {
-            const files = getFiles();
-            const file = files.find(f => f.id === fileId);
-            if (file) {
-                file.allowDownload = allow;
-                saveFiles(files);
-                renderAdminFiles();
-            }
-        }
-
-        function adminDelete(fileId) {
+        async function adminDelete(fileId) {
             if (confirm('Are you sure you want to delete this file permanently?')) {
-                let files = getFiles();
-                files = files.filter(f => f.id !== fileId);
-                saveFiles(files);
-                updateView();
+                const { db, doc, deleteDoc } = window.firebaseApp;
+                await deleteDoc(doc(db, 'files', fileId));
+                await updateView();
             }
         }
 
-        // Reader Modal Functions
-        function openReader(fileId) {
-            const files = getFiles();
-            const file = files.find(f => f.id === fileId);
-            if (!file) return;
-
-            document.getElementById('readerTitle').textContent = file.name;
+        function openReader(fileUrl, fileName, fileType) {
+            document.getElementById('readerTitle').textContent = fileName;
             const contentContainer = document.getElementById('readerContent');
             contentContainer.innerHTML = '';
 
-            const meta = getFileMeta(file.type, file.name);
+            const meta = getFileMeta(fileType, fileName);
 
             if (meta.tag === 'image') {
-                contentContainer.innerHTML = `<img src="${file.dataUrl}" alt="${file.name}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+                contentContainer.innerHTML = `<img src="${fileUrl}" alt="${fileName}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
             } else if (meta.tag === 'video') {
-                contentContainer.innerHTML = `<video controls src="${file.dataUrl}" style="max-width:100%; max-height:100%;" autoplay></video>`;
+                contentContainer.innerHTML = `<video controls src="${fileUrl}" style="max-width:100%; max-height:100%;" autoplay></video>`;
             } else if (meta.tag === 'audio') {
-                contentContainer.innerHTML = `<div style="text-align:center;"><p style="margin-bottom:1rem; font-weight:600;">${file.description}</p><audio controls src="${file.dataUrl}" style="width:300px;" autoplay></audio></div>`;
-            } else if (meta.tag === 'pdf') {
-                contentContainer.innerHTML = `<iframe src="${file.dataUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
-            } else if (meta.tag === 'text') {
-                // Decode base64 text if possible
-                try {
-                    const base64Data = file.dataUrl.split(',')[1];
-                    const decodedText = atob(base64Data);
-                    contentContainer.innerHTML = `<pre style="white-space: pre-wrap; font-family:monospace; background:#fff; padding:1.5rem; width:100%; height:100%; overflow:auto; border-radius:6px; border:1px solid var(--border);">${escapeHtml(decodedText)}</pre>`;
-                } catch(e) {
-                    contentContainer.innerHTML = `<iframe src="${file.dataUrl}" style="width:100%; height:100%; border:none; background:#fff;"></iframe>`;
-                }
+                contentContainer.innerHTML = `<div style="text-align:center;"><audio controls src="${fileUrl}" style="width:300px;" autoplay></audio></div>`;
+            } else if (meta.tag === 'pdf' || meta.tag === 'text') {
+                contentContainer.innerHTML = `<iframe src="${fileUrl}" style="width:100%; height:100%; border:none; background:#fff;"></iframe>`;
             } else {
-                contentContainer.innerHTML = `<div style="text-align:center;"><p style="margin-bottom:1rem;">Preview not available directly in browser for this file type.</p><a href="${file.dataUrl}" download="${file.name}" style="background:var(--primary); color:#fff; padding:0.6rem 1.2rem; text-decoration:none; border-radius:6px;">Download to Read</a></div>`;
+                contentContainer.innerHTML = `<div style="text-align:center;"><p style="margin-bottom:1rem;">Preview viewer not embedded for this format.</p><a href="${fileUrl}" target="_blank" style="background:var(--primary); color:#fff; padding:0.6rem 1.2rem; text-decoration:none; border-radius:6px;">Open / Download File</a></div>`;
             }
 
             document.getElementById('readerModal').style.display = 'flex';
@@ -669,12 +604,6 @@
             document.getElementById('readerModal').style.display = 'none';
             document.getElementById('readerContent').innerHTML = '';
         }
-
-        function escapeHtml(text) {
-            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-        }
-
-        window.onload = updateView;
     </script>
 </body>
 </html>
