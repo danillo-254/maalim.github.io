@@ -40,9 +40,12 @@
         
         .file-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1rem; }
         .file-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; padding: 1rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .file-card h4 { margin-bottom: 0.5rem; word-break: break-all; }
+        .file-card h4 { margin-bottom: 0.5rem; word-break: break-all; display: flex; align-items: center; gap: 0.5rem; }
         .file-card p { font-size: 0.85rem; color: #64748b; margin-bottom: 0.8rem; }
         
+        .preview-container { margin-top: 0.5rem; margin-bottom: 0.8rem; max-height: 150px; overflow: hidden; border-radius: 4px; display: flex; justify-content: center; background: #000; }
+        .preview-container img, .preview-container video, .preview-container audio { max-width: 100%; max-height: 140px; object-fit: contain; }
+
         .contact-box { background: #eff6ff; border-left: 4px solid var(--primary); padding: 1rem; margin-top: 2rem; border-radius: 4px; }
         .contact-box h3 { margin-bottom: 0.5rem; color: var(--primary-dark); }
         
@@ -50,7 +53,6 @@
         .nav-links { display: flex; gap: 1rem; align-items: center; }
         
         .badge { display: inline-block; padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 700; border-radius: 4px; }
-        .badge-pending { background: #fef3c7; color: #d97706; }
         .badge-approved { background: #dcfce7; color: #16a34a; }
         
         .error-msg { color: #dc2626; margin-bottom: 1rem; font-size: 0.9rem; }
@@ -61,11 +63,11 @@
 
     <header>
         <h1>Daniel's Resource Hub</h1>
-        <p>Secure Notes, Images & Video Sharing Platform</p>
+        <p>Official Notes, Images, Audio & Video Repository</p>
     </header>
 
     <div class="container">
-        <!-- Navigation & User Status bar -->
+        <!-- Navigation Bar -->
         <div id="sessionBar" class="nav-bar" style="display:none;">
             <div>Logged in as: <strong id="currentUsername"></strong> (<span id="currentUserRole"></span>)</div>
             <div class="nav-links">
@@ -73,11 +75,11 @@
             </div>
         </div>
 
-        <!-- AUTH VIEW (Login / Register) -->
+        <!-- AUTH VIEW (Login Only - Credentials Hidden) -->
         <div id="authView" class="card active-view">
-            <h2>User Login / Registration</h2>
+            <h2>User Login</h2>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Please log in to view Daniel's uploaded resources.</p>
             <div id="authError" class="error-msg"></div>
-            <div id="authSuccess" class="success-msg"></div>
             
             <div class="form-group">
                 <label>Username</label>
@@ -87,63 +89,55 @@
                 <label>Password</label>
                 <input type="password" id="authPassword" placeholder="Enter your password">
             </div>
-            <div style="display: flex; gap: 1rem;">
-                <button onclick="login()">Log In</button>
-                <button onclick="register()" style="background: #475569;">Register Account</button>
-            </div>
-            <p style="margin-top: 1rem; font-size: 0.85rem; color: #64748b;">* To log in as Administrator, use username <strong>admin</strong> and password <strong>admin123</strong>.</p>
+            <button onclick="login()">Log In</button>
         </div>
 
-        <!-- USER DASHBOARD VIEW -->
+        <!-- REGULAR USER DASHBOARD VIEW (View Only with Media Icons & Previews) -->
         <div id="userDashboard" class="card dashboard">
-            <h2>Upload Study Materials</h2>
+            <h2>Daniel's Official Uploads</h2>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Browse materials shared by Daniel. Downloads are locked unless explicitly permitted.</p>
+            <div id="userFileList" class="file-grid"></div>
+        </div>
+
+        <!-- ADMIN DASHBOARD VIEW (Upload & Control) -->
+        <div id="adminDashboard" class="card admin-panel">
+            <h2>Admin Upload & Control Panel</h2>
             <div id="uploadError" class="error-msg"></div>
             <div id="uploadSuccess" class="success-msg"></div>
             
             <div class="form-group">
-                <label>Select File (Notes, Images, Videos)</label>
+                <label>Upload File (Notes/PDFs, Images, Videos, Audio)</label>
                 <input type="file" id="fileInput">
             </div>
             <div class="form-group">
                 <label>Description / Title</label>
-                <input type="text" id="fileDescription" placeholder="e.g., Mathematics Calculus Chapter 1 Notes">
+                <input type="text" id="fileDescription" placeholder="e.g., Physics Lesson 1 Audio / Mathematics Notes">
             </div>
-            <button onclick="uploadFile()">Upload File for Approval</button>
+            <button onclick="uploadFile()">Upload File</button>
 
-            <h2 style="margin-top: 2rem;">Available Shared Files</h2>
-            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Note: Files can only be downloaded if explicit permission has been granted by the administrator.</p>
-            <div id="userFileList" class="file-grid"></div>
-        </div>
-
-        <!-- ADMIN DASHBOARD VIEW -->
-        <div id="adminDashboard" class="card admin-panel">
-            <h2>Administrator Control Panel</h2>
-            <p style="margin-bottom: 1.5rem;">You have full control over uploads, approvals, and permissions.</p>
-            
-            <h3 style="margin-bottom: 1rem;">Manage Uploaded Files Queue</h3>
+            <h2 style="margin-top: 2rem;">Manage All Uploaded Files</h2>
             <div id="adminFileList" class="file-grid"></div>
         </div>
 
-        <!-- CONTACT SECTION (Always Visible) -->
+        <!-- CONTACT SECTION -->
         <div class="contact-box">
             <h3>Need to Reach Daniel?</h3>
-            <p>If you have questions, require download permissions, or need assistance, please contact the administrator directly:</p>
+            <p>If you need download permission or have any questions, contact Daniel directly:</p>
             <p style="margin-top: 0.5rem;"><strong>Email:</strong> <a href="mailto:daniebandari@gmail.com">daniebandari@gmail.com</a></p>
             <p><strong>Tel:</strong> <a href="tel:0113696442">0113696442</a></p>
         </div>
     </div>
 
     <script>
-        // Database simulation using LocalStorage
         const DB_KEYS = {
             USERS: 'hub_users',
             FILES: 'hub_files',
             SESSION: 'hub_session'
         };
 
-        // Initialize default admin account if not present
         function initDB() {
             if (!localStorage.getItem(DB_KEYS.USERS)) {
+                // Pre-configure the admin account securely behind the scenes
                 const defaultUsers = [{ username: 'admin', password: 'admin123', role: 'admin' }];
                 localStorage.setItem(DB_KEYS.USERS, JSON.stringify(defaultUsers));
             }
@@ -153,8 +147,6 @@
         }
 
         function getUsers() { return JSON.parse(localStorage.getItem(DB_KEYS.USERS)); }
-        function saveUsers(users) { localStorage.setItem(DB_KEYS.USERS, JSON.stringify(users)); }
-        
         function getFiles() { return JSON.parse(localStorage.getItem(DB_KEYS.FILES)); }
         function saveFiles(files) { localStorage.setItem(DB_KEYS.FILES, JSON.stringify(files)); }
 
@@ -162,7 +154,6 @@
         function setSession(user) { localStorage.setItem(DB_KEYS.SESSION, JSON.stringify(user)); }
         function clearSession() { localStorage.removeItem(DB_KEYS.SESSION); }
 
-        // Navigation control
         function updateView() {
             initDB();
             const session = getSession();
@@ -171,7 +162,6 @@
             const adminDashboard = document.getElementById('adminDashboard');
             const sessionBar = document.getElementById('sessionBar');
 
-            // Reset views
             authView.classList.remove('active-view');
             userDashboard.classList.remove('active-view');
             adminDashboard.classList.remove('active-view');
@@ -182,7 +172,7 @@
             } else {
                 sessionBar.style.display = 'flex';
                 document.getElementById('currentUsername').textContent = session.username;
-                document.getElementById('currentUserRole').textContent = session.role.toUpperCase();
+                document.getElementById('currentUserRole').textContent = session.role === 'admin' ? 'ADMIN (YOU)' : 'USER';
 
                 if (session.role === 'admin') {
                     adminDashboard.classList.add('active-view');
@@ -192,31 +182,6 @@
                     renderUserFiles();
                 }
             }
-        }
-
-        // Auth functions
-        function register() {
-            const username = document.getElementById('authUsername').value.trim();
-            const password = document.getElementById('authPassword').value.trim();
-            const errorEl = document.getElementById('authError');
-            const successEl = document.getElementById('authSuccess');
-            errorEl.textContent = '';
-            successEl.textContent = '';
-
-            if (!username || !password) {
-                errorEl.textContent = 'Please fill in both username and password.';
-                return;
-            }
-
-            const users = getUsers();
-            if (users.some(u => u.username === username)) {
-                errorEl.textContent = 'Username already exists. Please choose another or log in.';
-                return;
-            }
-
-            users.push({ username, password, role: 'user' });
-            saveUsers(users);
-            successEl.textContent = 'Registration successful! You can now log in.';
         }
 
         function login() {
@@ -244,7 +209,20 @@
             updateView();
         }
 
-        // File upload functions
+        // Helper to determine file icon and category type
+        function getFileMeta(type, name) {
+            if (type.startsWith('image/')) {
+                return { icon: '🖼️', label: 'Image', tag: 'image' };
+            } else if (type.startsWith('video/')) {
+                return { icon: '🎬', label: 'Video', tag: 'video' };
+            } else if (type.startsWith('audio/')) {
+                return { icon: '🎵', label: 'Audio', tag: 'audio' };
+            } else {
+                return { icon: '📝', label: 'Notes / Document', tag: 'doc' };
+            }
+        }
+
+        // Admin File Upload function
         function uploadFile() {
             const fileInput = document.getElementById('fileInput');
             const descInput = document.getElementById('fileDescription');
@@ -263,7 +241,6 @@
 
             reader.onload = function(e) {
                 const files = getFiles();
-                const session = getSession();
 
                 const newFile = {
                     id: 'file_' + Date.now(),
@@ -271,10 +248,8 @@
                     size: (file.size / (1024*1024)).toFixed(2) + ' MB',
                     type: file.type,
                     description: descInput.value || 'No description provided',
-                    uploader: session.username,
                     dataUrl: e.target.result,
-                    status: 'pending', // pending or approved
-                    allowDownload: false // Controlled by admin
+                    allowDownload: false // Locked by default
                 };
 
                 files.push(newFile);
@@ -282,100 +257,89 @@
 
                 fileInput.value = '';
                 descInput.value = '';
-                successEl.textContent = 'File uploaded successfully and sent to admin for review!';
-                renderUserFiles();
+                successEl.textContent = 'File uploaded successfully!';
+                renderAdminFiles();
             };
 
             reader.readAsDataURL(file);
         }
 
-        // Render file lists for regular users
+        // Render files for regular users (View only, icons included)
         function renderUserFiles() {
             const files = getFiles();
             const container = document.getElementById('userFileList');
             container.innerHTML = '';
 
-            // Users can see approved files, or their own pending files
-            const session = getSession();
-            const visibleFiles = files.filter(f => f.status === 'approved' || f.uploader === session.username);
-
-            if (visibleFiles.length === 0) {
-                container.innerHTML = '<p style="color: #64748b;">No files available yet.</p>';
-                return;
-            }
-
-            visibleFiles.forEach(file => {
-                const card = document.createElement('div');
-                card.className = 'file-card';
-                
-                let badge = file.status === 'approved' 
-                    ? '<span class="badge badge-approved">Approved</span>' 
-                    : '<span class="badge badge-pending">Pending Review</span>';
-
-                let downloadAction = '';
-                if (file.status === 'approved' && file.allowDownload) {
-                    downloadAction = `<a href="${file.dataUrl}" download="${file.name}" style="display:inline-block; margin-top:0.8rem; background:#16a34a; color:#fff; padding:0.4rem 0.8rem; text-decoration:none; border-radius:4px; font-size:0.9rem;">Download File</a>`;
-                } else {
-                    downloadAction = `<p style="margin-top:0.8rem; color:#dc2626; font-size:0.85rem;">🔒 Download locked. Contact admin (daniebandari@gmail.com) for permission.</p>`;
-                }
-
-                card.innerHTML = `
-                    <h4>${file.name} ${badge}</h4>
-                    <p><strong>Description:</strong> ${file.description}</p>
-                    <p><strong>Size:</strong> ${file.size} | <strong>Uploaded by:</strong> ${file.uploader}</p>
-                    ${downloadAction}
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Render file lists for Admin control panel
-        function renderAdminFiles() {
-            const files = getFiles();
-            const container = document.getElementById('adminFileList');
-            container.innerHTML = '';
-
             if (files.length === 0) {
-                container.innerHTML = '<p style="color: #64748b;">No files uploaded in the system yet.</p>';
+                container.innerHTML = '<p style="color: #64748b;">Daniel has not uploaded any files yet. Check back soon!</p>';
                 return;
             }
 
             files.forEach(file => {
                 const card = document.createElement('div');
                 card.className = 'file-card';
+                const meta = getFileMeta(file.type, file.name);
 
-                let statusBadge = file.status === 'approved' 
-                    ? '<span class="badge badge-approved">Approved</span>' 
-                    : '<span class="badge badge-pending">Pending</span>';
+                let previewHtml = '';
+                if (meta.tag === 'image') {
+                    previewHtml = `<div class="preview-container"><img src="${file.dataUrl}" alt="${file.name}"></div>`;
+                } else if (meta.tag === 'video') {
+                    previewHtml = `<div class="preview-container"><video controls src="${file.dataUrl}"></video></div>`;
+                } else if (meta.tag === 'audio') {
+                    previewHtml = `<div class="preview-container" style="background:#f1f5f9; padding: 10px;"><audio controls src="${file.dataUrl}" style="width:100%"></audio></div>`;
+                }
 
-                let permissionBadge = file.allowDownload 
-                    ? '<span class="badge badge-approved">Download Permitted</span>' 
-                    : '<span class="badge badge-pending">Download Restricted</span>';
+                let downloadAction = '';
+                if (file.allowDownload) {
+                    downloadAction = `<a href="${file.dataUrl}" download="${file.name}" style="display:inline-block; margin-top:0.8rem; background:#16a34a; color:#fff; padding:0.4rem 0.8rem; text-decoration:none; border-radius:4px; font-size:0.9rem;">Download File</a>`;
+                } else {
+                    downloadAction = `<p style="margin-top:0.8rem; color:#dc2626; font-size:0.85rem;">🔒 Download locked. Contact Daniel at daniebandari@gmail.com for permission.</p>`;
+                }
 
                 card.innerHTML = `
-                    <h4>${file.name} ${statusBadge}</h4>
+                    <h4><span>${meta.icon}</span> ${file.name}</h4>
+                    <p><strong>Type:</strong> ${meta.label}</p>
                     <p><strong>Description:</strong> ${file.description}</p>
-                    <p><strong>Uploaded by:</strong> ${file.uploader} (${file.size})</p>
-                    <p><strong>Permission:</strong> ${permissionBadge}</p>
-                    <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                        ${file.status === 'pending' ? `<button onclick="adminApprove('${file.id}')" class="btn-success" style="padding:0.3rem 0.6rem; font-size:0.85rem;">Approve</button>` : ''}
-                        ${!file.allowDownload ? `<button onclick="adminToggleDownload('${file.id}', true)" style="padding:0.3rem 0.6rem; font-size:0.85rem;">Allow Download</button>` : `<button onclick="adminToggleDownload('${file.id}', false)" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem;">Revoke Download</button>`}
-                        <button onclick="adminDelete('${file.id}')" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem;">Delete</button>
-                    </div>
+                    ${previewHtml}
+                    ${downloadAction}
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Admin Actions
-        function adminApprove(fileId) {
+        // Render files in Admin Dashboard
+        function renderAdminFiles() {
             const files = getFiles();
-            const file = files.find(f => f.id === fileId);
-            if (file) {
-                file.status = 'approved';
-                saveFiles(files);
-                renderAdminFiles();
+            const container = document.getElementById('adminFileList');
+            container.innerHTML = '';
+
+            if (files.length === 0) {
+                container.innerHTML = '<p style="color: #64748b;">No files uploaded yet.</p>';
+                return;
             }
+
+            files.forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'file-card';
+                const meta = getFileMeta(file.type, file.name);
+
+                let permissionBadge = file.allowDownload 
+                    ? '<span class="badge badge-approved">Download Permitted</span>' 
+                    : '<span class="badge badge-danger" style="background:#fef2f2; color:#dc2626; padding:0.25rem 0.5rem; border-radius:4px; font-size:0.75rem; font-weight:700;">Download Restricted</span>';
+
+                card.innerHTML = `
+                    <h4><span>${meta.icon}</span> ${file.name}</h4>
+                    <p><strong>Type:</strong> ${meta.label}</p>
+                    <p><strong>Description:</strong> ${file.description}</p>
+                    <p><strong>Size:</strong> ${file.size}</p>
+                    <p><strong>Status:</strong> ${permissionBadge}</p>
+                    <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        ${!file.allowDownload ? `<button onclick="adminToggleDownload('${file.id}', true)" class="btn-success" style="padding:0.3rem 0.6rem; font-size:0.85rem;">Allow Download</button>` : `<button onclick="adminToggleDownload('${file.id}', false)" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem;">Revoke Download</button>`}
+                        <button onclick="adminDelete('${file.id}')" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem;">Delete</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
 
         function adminToggleDownload(fileId, allow) {
@@ -397,7 +361,6 @@
             }
         }
 
-        // Run initialization on load
         window.onload = updateView;
     </script>
 </body>
