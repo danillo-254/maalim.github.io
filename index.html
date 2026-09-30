@@ -54,6 +54,8 @@
         
         .badge { display: inline-block; padding: 0.25rem 0.5rem; font-size: 0.75rem; font-weight: 700; border-radius: 4px; }
         .badge-approved { background: #dcfce7; color: #16a34a; }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-rejected { background: #fee2e2; color: #dc2626; }
         
         .error-msg { color: #dc2626; margin-bottom: 1rem; font-size: 0.9rem; }
         .success-msg { color: #16a34a; margin-bottom: 1rem; font-size: 0.9rem; }
@@ -122,14 +124,32 @@
             </div>
         </div>
 
-        <!-- REGULAR USER DASHBOARD VIEW (View Only with Media Icons & Previews) -->
+        <!-- REGULAR USER DASHBOARD VIEW (View, Read, Open & Upload for Approval) -->
         <div id="userDashboard" class="card dashboard">
             <h2>Daniel's Official Uploads</h2>
-            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Browse materials shared by Daniel. Downloads are locked unless explicitly permitted.</p>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Browse materials shared by Daniel. You can open/read documents, view previews, and download if permitted.</p>
             <div id="userFileList" class="file-grid"></div>
+
+            <h2 style="margin-top: 2.5rem;">Contribute / Upload Material</h2>
+            <p style="margin-bottom: 1rem; font-size: 0.9rem; color: #64748b;">Submit a file for Daniel (Admin) to review and approve.</p>
+            <div id="userUploadError" class="error-msg"></div>
+            <div id="userUploadSuccess" class="success-msg"></div>
+
+            <div class="form-group">
+                <label>Select File (Notes, PDFs, Images, Videos, Audio)</label>
+                <input type="file" id="userFileInput">
+            </div>
+            <div class="form-group">
+                <label>Description / Title</label>
+                <input type="text" id="userFileDescription" placeholder="e.g., My Revision Notes">
+            </div>
+            <button onclick="userUploadFile()" class="btn-success">Submit for Admin Approval</button>
+
+            <h2 style="margin-top: 2.5rem;">My Submitted Uploads</h2>
+            <div id="mySubmittedList" class="file-grid"></div>
         </div>
 
-        <!-- ADMIN DASHBOARD VIEW (Upload & Control) -->
+        <!-- ADMIN DASHBOARD VIEW (Upload, Moderate & Control) -->
         <div id="adminDashboard" class="card admin-panel">
             <h2>Admin Upload & Control Panel</h2>
             <div id="uploadError" class="error-msg"></div>
@@ -143,9 +163,12 @@
                 <label>Description / Title</label>
                 <input type="text" id="fileDescription" placeholder="e.g., Physics Lesson 1 Audio / Mathematics Notes">
             </div>
-            <button onclick="uploadFile()">Upload File</button>
+            <button onclick="adminUploadFile()">Upload File</button>
 
-            <h2 style="margin-top: 2rem;">Manage All Uploaded Files</h2>
+            <h2 style="margin-top: 2.5rem;">User Submissions Awaiting Approval</h2>
+            <div id="adminPendingList" class="file-grid"></div>
+
+            <h2 style="margin-top: 2.5rem;">Manage All Official Hub Files</h2>
             <div id="adminFileList" class="file-grid"></div>
         </div>
 
@@ -158,6 +181,17 @@
         </div>
     </div>
 
+    <!-- Reader / Viewer Modal -->
+    <div id="readerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:1000; justify-content:center; align-items:center; padding:2rem;">
+        <div style="background:#fff; width:100%; max-width:800px; height:85vh; border-radius:10px; display:flex; flex-direction:column; overflow:hidden;">
+            <div style="padding:1rem 1.5rem; background:var(--primary); color:#fff; display:flex; justify-content:space-between; align-items:center;">
+                <h3 id="readerTitle" style="margin:0; font-size:1.2rem;">Reader</h3>
+                <button onclick="closeReader()" style="background:#dc2626; width:auto; padding:0.3rem 0.8rem; font-size:0.9rem;">Close</button>
+            </div>
+            <div id="readerContent" style="flex:1; overflow:auto; padding:1.5rem; display:flex; justify-content:center; align-items:center; background:#f1f5f9;"></div>
+        </div>
+    </div>
+
     <script>
         const DB_KEYS = {
             USERS: 'hub_users',
@@ -167,7 +201,6 @@
 
         function initDB() {
             if (!localStorage.getItem(DB_KEYS.USERS)) {
-                // Pre-configure Daniel's admin account securely behind the scenes
                 const defaultUsers = [{ username: 'admin', password: 'admin123', role: 'admin' }];
                 localStorage.setItem(DB_KEYS.USERS, JSON.stringify(defaultUsers));
             }
@@ -234,9 +267,11 @@
                 if (session.role === 'admin') {
                     adminDashboard.classList.add('active-view');
                     renderAdminFiles();
+                    renderAdminPending();
                 } else {
                     userDashboard.classList.add('active-view');
                     renderUserFiles();
+                    renderUserMySubmissions();
                 }
             }
         }
@@ -297,19 +332,25 @@
             updateView();
         }
 
-        function getFileMeta(type) {
+        function getFileMeta(type, name) {
+            const lowerName = name ? name.toLowerCase() : '';
             if (type.startsWith('image/')) {
                 return { icon: '🖼️', label: 'Image', tag: 'image' };
             } else if (type.startsWith('video/')) {
                 return { icon: '🎬', label: 'Video', tag: 'video' };
             } else if (type.startsWith('audio/')) {
                 return { icon: '🎵', label: 'Audio', tag: 'audio' };
+            } else if (type.includes('pdf') || lowerName.endsWith('.pdf')) {
+                return { icon: '📄', label: 'PDF Document', tag: 'pdf' };
+            } else if (type.includes('text') || lowerName.endsWith('.txt') || lowerName.endsWith('.md')) {
+                return { icon: '📝', label: 'Text Document', tag: 'text' };
             } else {
-                return { icon: '📝', label: 'Notes / Document', tag: 'doc' };
+                return { icon: '📁', label: 'Document / File', tag: 'doc' };
             }
         }
 
-        function uploadFile() {
+        // Admin direct upload
+        function adminUploadFile() {
             const fileInput = document.getElementById('fileInput');
             const descInput = document.getElementById('fileDescription');
             const errorEl = document.getElementById('uploadError');
@@ -328,7 +369,6 @@
             reader.onload = function(e) {
                 try {
                     const files = getFiles();
-
                     const newFile = {
                         id: 'file_' + Date.now(),
                         name: file.name,
@@ -336,7 +376,9 @@
                         type: file.type || 'application/octet-stream',
                         description: descInput.value || 'No description provided',
                         dataUrl: e.target.result,
-                        allowDownload: false // Locked by default
+                        allowDownload: false,
+                        status: 'approved', // Admin uploads are approved automatically
+                        uploader: 'admin'
                     };
 
                     files.push(newFile);
@@ -347,19 +389,62 @@
                     successEl.textContent = 'File uploaded successfully!';
                     renderAdminFiles();
                 } catch (err) {
-                    errorEl.textContent = 'Upload failed (file might be too large for browser storage).';
+                    errorEl.textContent = 'Upload failed (file might be too large).';
                 }
             };
-
-            reader.onerror = function() {
-                errorEl.textContent = 'Failed to read the selected file.';
-            };
-
             reader.readAsDataURL(file);
         }
 
+        // User submit file for approval
+        function userUploadFile() {
+            const fileInput = document.getElementById('userFileInput');
+            const descInput = document.getElementById('userFileDescription');
+            const errorEl = document.getElementById('userUploadError');
+            const successEl = document.getElementById('userUploadSuccess');
+            errorEl.textContent = '';
+            successEl.textContent = '';
+
+            if (fileInput.files.length === 0) {
+                errorEl.textContent = 'Please select a file to submit.';
+                return;
+            }
+
+            const session = getSession();
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                try {
+                    const files = getFiles();
+                    const newFile = {
+                        id: 'file_' + Date.now(),
+                        name: file.name,
+                        size: (file.size / (1024*1024)).toFixed(2) + ' MB',
+                        type: file.type || 'application/octet-stream',
+                        description: descInput.value || 'No description provided',
+                        dataUrl: e.target.result,
+                        allowDownload: false,
+                        status: 'pending', // Awaiting admin approval
+                        uploader: session.username
+                    };
+
+                    files.push(newFile);
+                    saveFiles(files);
+
+                    fileInput.value = '';
+                    descInput.value = '';
+                    successEl.textContent = 'File submitted successfully! Waiting for admin review.';
+                    renderUserMySubmissions();
+                } catch (err) {
+                    errorEl.textContent = 'Submission failed (file might be too large).';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Render files for regular users (Only approved files)
         function renderUserFiles() {
-            const files = getFiles();
+            const files = getFiles().filter(f => f.status === 'approved');
             const container = document.getElementById('userFileList');
             container.innerHTML = '';
 
@@ -371,7 +456,7 @@
             files.forEach(file => {
                 const card = document.createElement('div');
                 card.className = 'file-card';
-                const meta = getFileMeta(file.type);
+                const meta = getFileMeta(file.type, file.name);
 
                 let previewHtml = '';
                 if (meta.tag === 'image') {
@@ -382,38 +467,108 @@
                     previewHtml = `<div class="preview-container" style="background:#f1f5f9; padding: 10px;"><audio controls src="${file.dataUrl}" style="width:100%"></audio></div>`;
                 }
 
+                let readButton = `<button onclick="openReader('${file.id}')" style="margin-top:0.8rem; padding:0.4rem 0.8rem; font-size:0.9rem; width:auto;">Open & Read / View</button>`;
+
                 let downloadAction = '';
                 if (file.allowDownload) {
                     downloadAction = `<a href="${file.dataUrl}" download="${file.name}" style="display:inline-block; margin-top:0.8rem; background:#16a34a; color:#fff; padding:0.4rem 0.8rem; text-decoration:none; border-radius:4px; font-size:0.9rem;">Download File</a>`;
                 } else {
-                    downloadAction = `<p style="margin-top:0.8rem; color:#dc2626; font-size:0.85rem;">🔒 Download locked. Contact Daniel at daniebandari@gmail.com for permission.</p>`;
+                    downloadAction = `<p style="margin-top:0.8rem; color:#dc2626; font-size:0.85rem;">🔒 Download locked. Contact Daniel for permission.</p>`;
                 }
 
                 card.innerHTML = `
                     <h4><span>${meta.icon}</span> ${file.name}</h4>
                     <p><strong>Type:</strong> ${meta.label}</p>
                     <p><strong>Description:</strong> ${file.description}</p>
+                    <p><strong>Shared by:</strong> ${file.uploader === 'admin' ? 'Daniel (Admin)' : file.uploader}</p>
                     ${previewHtml}
+                    <div style="display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center;">
+                        ${readButton}
+                    </div>
                     ${downloadAction}
                 `;
                 container.appendChild(card);
             });
         }
 
-        function renderAdminFiles() {
-            const files = getFiles();
-            const container = document.getElementById('adminFileList');
+        // Render user's own submissions
+        function renderUserMySubmissions() {
+            const session = getSession();
+            const files = getFiles().filter(f => f.uploader === session.username);
+            const container = document.getElementById('mySubmittedList');
             container.innerHTML = '';
 
             if (files.length === 0) {
-                container.innerHTML = '<p style="color: #64748b;">No files uploaded yet.</p>';
+                container.innerHTML = '<p style="color: #64748b;">You have not submitted any files yet.</p>';
                 return;
             }
 
             files.forEach(file => {
                 const card = document.createElement('div');
                 card.className = 'file-card';
-                const meta = getFileMeta(file.type);
+                const meta = getFileMeta(file.type, file.name);
+
+                let statusBadge = '';
+                if (file.status === 'approved') statusBadge = '<span class="badge badge-approved">Approved by Admin</span>';
+                else if (file.status === 'rejected') statusBadge = '<span class="badge badge-rejected">Rejected</span>';
+                else statusBadge = '<span class="badge badge-pending">Pending Approval</span>';
+
+                card.innerHTML = `
+                    <h4><span>${meta.icon}</span> ${file.name}</h4>
+                    <p><strong>Description:</strong> ${file.description}</p>
+                    <p><strong>Status:</strong> ${statusBadge}</p>
+                    <button onclick="openReader('${file.id}')" style="margin-top:0.8rem; padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">View File</button>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Admin: Render pending user submissions
+        function renderAdminPending() {
+            const files = getFiles().filter(f => f.status === 'pending');
+            const container = document.getElementById('adminPendingList');
+            container.innerHTML = '';
+
+            if (files.length === 0) {
+                container.innerHTML = '<p style="color: #64748b;">No pending user submissions.</p>';
+                return;
+            }
+
+            files.forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'file-card';
+                const meta = getFileMeta(file.type, file.name);
+
+                card.innerHTML = `
+                    <h4><span>${meta.icon}</span> ${file.name}</h4>
+                    <p><strong>Submitted by:</strong> ${file.uploader}</p>
+                    <p><strong>Description:</strong> ${file.description}</p>
+                    <p><strong>Size:</strong> ${file.size}</p>
+                    <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button onclick="openReader('${file.id}')" style="background:#2563eb; padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Read / View</button>
+                        <button onclick="adminApproveFile('${file.id}')" class="btn-success" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Approve</button>
+                        <button onclick="adminRejectFile('${file.id}')" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Decline</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Admin: Render all approved/managed files
+        function renderAdminFiles() {
+            const files = getFiles().filter(f => f.status === 'approved');
+            const container = document.getElementById('adminFileList');
+            container.innerHTML = '';
+
+            if (files.length === 0) {
+                container.innerHTML = '<p style="color: #64748b;">No approved hub files yet.</p>';
+                return;
+            }
+
+            files.forEach(file => {
+                const card = document.createElement('div');
+                card.className = 'file-card';
+                const meta = getFileMeta(file.type, file.name);
 
                 let permissionBadge = file.allowDownload 
                     ? '<span class="badge badge-approved">Download Permitted</span>' 
@@ -423,15 +578,36 @@
                     <h4><span>${meta.icon}</span> ${file.name}</h4>
                     <p><strong>Type:</strong> ${meta.label}</p>
                     <p><strong>Description:</strong> ${file.description}</p>
-                    <p><strong>Size:</strong> ${file.size}</p>
+                    <p><strong>Uploader:</strong> ${file.uploader}</p>
                     <p><strong>Status:</strong> ${permissionBadge}</p>
                     <div style="margin-top: 1rem; display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                        <button onclick="openReader('${file.id}')" style="background:#2563eb; padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Read / View</button>
                         ${!file.allowDownload ? `<button onclick="adminToggleDownload('${file.id}', true)" class="btn-success" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Allow Download</button>` : `<button onclick="adminToggleDownload('${file.id}', false)" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Revoke Download</button>`}
                         <button onclick="adminDelete('${file.id}')" class="btn-danger" style="padding:0.3rem 0.6rem; font-size:0.85rem; width:auto;">Delete</button>
                     </div>
                 `;
                 container.appendChild(card);
             });
+        }
+
+        function adminApproveFile(fileId) {
+            const files = getFiles();
+            const file = files.find(f => f.id === fileId);
+            if (file) {
+                file.status = 'approved';
+                saveFiles(files);
+                updateView();
+            }
+        }
+
+        function adminRejectFile(fileId) {
+            const files = getFiles();
+            const file = files.find(f => f.id === fileId);
+            if (file) {
+                file.status = 'rejected';
+                saveFiles(files);
+                updateView();
+            }
         }
 
         function adminToggleDownload(fileId, allow) {
@@ -449,8 +625,53 @@
                 let files = getFiles();
                 files = files.filter(f => f.id !== fileId);
                 saveFiles(files);
-                renderAdminFiles();
+                updateView();
             }
+        }
+
+        // Reader Modal Functions
+        function openReader(fileId) {
+            const files = getFiles();
+            const file = files.find(f => f.id === fileId);
+            if (!file) return;
+
+            document.getElementById('readerTitle').textContent = file.name;
+            const contentContainer = document.getElementById('readerContent');
+            contentContainer.innerHTML = '';
+
+            const meta = getFileMeta(file.type, file.name);
+
+            if (meta.tag === 'image') {
+                contentContainer.innerHTML = `<img src="${file.dataUrl}" alt="${file.name}" style="max-width:100%; max-height:100%; object-fit:contain;">`;
+            } else if (meta.tag === 'video') {
+                contentContainer.innerHTML = `<video controls src="${file.dataUrl}" style="max-width:100%; max-height:100%;" autoplay></video>`;
+            } else if (meta.tag === 'audio') {
+                contentContainer.innerHTML = `<div style="text-align:center;"><p style="margin-bottom:1rem; font-weight:600;">${file.description}</p><audio controls src="${file.dataUrl}" style="width:300px;" autoplay></audio></div>`;
+            } else if (meta.tag === 'pdf') {
+                contentContainer.innerHTML = `<iframe src="${file.dataUrl}" style="width:100%; height:100%; border:none;"></iframe>`;
+            } else if (meta.tag === 'text') {
+                // Decode base64 text if possible
+                try {
+                    const base64Data = file.dataUrl.split(',')[1];
+                    const decodedText = atob(base64Data);
+                    contentContainer.innerHTML = `<pre style="white-space: pre-wrap; font-family:monospace; background:#fff; padding:1.5rem; width:100%; height:100%; overflow:auto; border-radius:6px; border:1px solid var(--border);">${escapeHtml(decodedText)}</pre>`;
+                } catch(e) {
+                    contentContainer.innerHTML = `<iframe src="${file.dataUrl}" style="width:100%; height:100%; border:none; background:#fff;"></iframe>`;
+                }
+            } else {
+                contentContainer.innerHTML = `<div style="text-align:center;"><p style="margin-bottom:1rem;">Preview not available directly in browser for this file type.</p><a href="${file.dataUrl}" download="${file.name}" style="background:var(--primary); color:#fff; padding:0.6rem 1.2rem; text-decoration:none; border-radius:6px;">Download to Read</a></div>`;
+            }
+
+            document.getElementById('readerModal').style.display = 'flex';
+        }
+
+        function closeReader() {
+            document.getElementById('readerModal').style.display = 'none';
+            document.getElementById('readerContent').innerHTML = '';
+        }
+
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
         }
 
         window.onload = updateView;
