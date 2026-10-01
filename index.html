@@ -306,21 +306,20 @@
     </div>
 
     <script>
-        // TODO: Replace the configuration values below with your own Firebase Project settings
         const firebaseConfig = {
-           apiKey: "AIzaSyB77IErJJH-Y4sixxLFFEnuO21q6HjIp7w",
-    authDomain: "maalim-946b5.firebaseapp.com",
-    projectId: "maalim-946b5",
-    storageBucket: "maalim-946b5.firebasestorage.app",
-    messagingSenderId: "485463178885",
-    appId: "1:485463178885:web:714542425d3f2ffff2b3ec",
-    measurementId: "G-5X05PKDGCR"
+            apiKey: "AIzaSyB77IErJJH-Y4sixxLFFEnuO21q6HjIp7w",
+            authDomain: "maalim-946b5.firebaseapp.com",
+            projectId: "maalim-946b5",
+            storageBucket: "maalim-946b5.firebasestorage.app",
+            messagingSenderId: "485463178885",
+            appId: "1:485463178885:web:714542425d3f2ffff2b3ec",
+            measurementId: "G-5X05PKDGCR"
         };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        // const storage = firebase.storage();
+        const storage = firebase.storage();
 
         let resources = [];
         let users = { "student1": "password123" };
@@ -337,7 +336,6 @@
 
         // Fetch Real-time Cloud Data from Firebase Firestore
         function initCloudSync() {
-            // Sync Resources
             db.collection("resources").onSnapshot((snapshot) => {
                 resources = [];
                 snapshot.forEach((doc) => {
@@ -350,7 +348,6 @@
                 renderLists();
             });
 
-            // Sync Users
             db.collection("users").doc("accounts").onSnapshot((doc) => {
                 if (doc.exists) {
                     users = doc.data();
@@ -372,7 +369,7 @@
                 btn.textContent = "🙈";
             } else {
                 passwordInput.type = "password";
-                btn.textContent = "👁️️";
+                btn.textContent = "👁";
             }
         }
 
@@ -412,7 +409,6 @@
             let u = document.getElementById('loginUser').value.trim();
             let p = document.getElementById('loginPass').value.trim();
 
-            // Admin Check
             if(u === "maalim003" && p === "14415") {
                 activeSession = { username: "maalim003", role: "admin" };
                 localStorage.setItem('active_session', JSON.stringify(activeSession));
@@ -421,7 +417,6 @@
                 return;
             }
 
-            // End User Check
             if(users[u] && users[u] === p) {
                 activeSession = { username: u, role: "user" };
                 localStorage.setItem('active_session', JSON.stringify(activeSession));
@@ -572,13 +567,10 @@
             let textContentInput = document.getElementById('uploadTextContent').value.trim();
             let fileInput = document.getElementById('uploadFile');
 
-            if(!title) {
-                alert("Please provide a title or link URL.");
+            if(!title && fileInput.files.length === 0) {
+                alert("Please provide a title or choose a file to upload.");
                 return;
             }
-
-            let fileUrl = title;
-            let contentText = textContentInput || "Uploaded study material content.";
 
             if(fileInput.files.length > 0) {
                 let file = fileInput.files[0];
@@ -588,18 +580,29 @@
                     return;
                 }
 
+                if(!title) {
+                    title = file.name;
+                }
+
                 alert("Uploading file to cloud storage, please wait...");
                 let storageRef = storage.ref('uploads/' + Date.now() + '_' + file.name);
                 storageRef.put(file).then(snapshot => {
                     snapshot.ref.getDownloadURL().then(downloadURL => {
-                        saveResourceToCloud(title, type, downloadURL, contentText || file.name);
+                        saveResourceToCloud(title, type, downloadURL, textContentInput || file.name);
                     });
                 }).catch(error => {
-                    alert("Upload failed: " + error.message);
+                    // Fallback to local Data URL if Firebase Storage permissions/bucket rules restrict direct web uploads
+                    let reader = new FileReader();
+                    reader.onload = function(e) {
+                        saveResourceToCloud(title, type, e.target.result, textContentInput || file.name);
+                    };
+                    reader.readAsDataURL(file);
                 });
                 return;
             }
 
+            let fileUrl = title;
+            let contentText = textContentInput || "Uploaded study material content.";
             saveResourceToCloud(title, type, fileUrl, contentText);
         }
 
