@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resource & Study Platform</title>
+    <title>Maalim's Resource and Study Platform</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -137,7 +137,7 @@
 <body>
 
     <header>
-        <h1>Resource & Study Platform</h1>
+        <h1>Welcome to Maalim's Resource and Study Platform</h1>
         <p>Access notes, links, videos, images, and audio securely.</p>
     </header>
 
@@ -204,10 +204,10 @@
         <!-- ADMIN PANEL -->
         <div id="adminPanel" class="panel">
             <h2>Admin Dashboard (maalim003)</h2>
-            <p>Full control panel: Upload items up to 15MB, manage download permissions, view registered accounts, and check visit history.</p>
+            <p>Full control panel: Upload items up to 30MB, manage download permissions, view registered accounts, and check visit history.</p>
 
             <div class="auth-card">
-                <h3>Upload New Resource (Admin Limit: 15MB)</h3>
+                <h3>Upload New Resource (Admin Limit: 30MB)</h3>
                 <input type="text" id="uploadTitle" placeholder="Resource Title or Link URL">
                 <select id="uploadType">
                     <option value="Note">Note / Document / PDF</option>
@@ -477,8 +477,8 @@
             if(fileInput.files.length > 0) {
                 let file = fileInput.files[0];
                 let fileSizeMB = file.size / (1024*1024);
-                if(fileSizeMB > 15) {
-                    alert("File size exceeds the 15MB limit!");
+                if(fileSizeMB > 30) {
+                    alert("File size exceeds the 30MB limit!");
                     return;
                 }
                 fileUrl = URL.createObjectURL(file);
