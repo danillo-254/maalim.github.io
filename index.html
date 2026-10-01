@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Resource Sharing Platform</title>
+    <title>Resource & Study Platform</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -11,6 +11,7 @@
             --bg: #f4f6f9;
             --white: #ffffff;
             --danger: #e74c3c;
+            --success: #27ae60;
         }
         body {
             font-family: Arial, sans-serif;
@@ -35,8 +36,12 @@
         }
         .nav-buttons {
             display: flex;
-            gap: 10px;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 20px;
+            background: #eef2f7;
+            padding: 10px;
+            border-radius: 6px;
         }
         button {
             background-color: var(--accent);
@@ -52,6 +57,9 @@
         }
         button.danger {
             background-color: var(--danger);
+        }
+        button.success {
+            background-color: var(--success);
         }
         .panel {
             display: none;
@@ -87,6 +95,13 @@
             margin-top: 25px;
             border-left: 4px solid var(--accent);
         }
+        .auth-card {
+            background: #fafafa;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -97,52 +112,73 @@
     </header>
 
     <div class="container">
-        <!-- Navigation Buttons -->
+        <!-- Top Status Bar -->
         <div class="nav-buttons">
-            <button onclick="switchTab('userPanel')">End User View</button>
-            <button onclick="promptAdminLogin()">Admin Login</button>
+            <span id="currentUserDisplay" style="font-weight: bold; color: var(--primary);">Status: Not Logged In</span>
+            <div>
+                <button id="navUserBtn" onclick="switchPanel('userPanel')" style="display:none;">User Dashboard</button>
+                <button id="navAdminBtn" onclick="switchPanel('adminPanel')" style="display:none;">Admin Dashboard</button>
+                <button class="danger" id="logoutBtn" onclick="logout()" style="display:none;">Log Out</button>
+            </div>
+        </div>
+
+        <!-- AUTH PANEL (Login / Register) -->
+        <div id="authPanel" class="panel active">
+            <h2>Welcome! Please Log In or Create an Account</h2>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                
+                <!-- Login Box -->
+                <div class="auth-card" style="flex: 1; min-width: 280px;">
+                    <h3>User / Admin Log In</h3>
+                    <input type="text" id="loginUser" placeholder="Username">
+                    <input type="password" id="loginPass" placeholder="Password">
+                    <button class="success" onclick="login()">Log In</button>
+                </div>
+
+                <!-- Registration Box -->
+                <div class="auth-card" style="flex: 1; min-width: 280px;">
+                    <h3>Create End User Account</h3>
+                    <input type="text" id="regUser" placeholder="Choose Username">
+                    <input type="password" id="regPass" placeholder="Choose Password">
+                    <button onclick="registerUser()">Register Account</button>
+                </div>
+
+            </div>
         </div>
 
         <!-- END USER PANEL -->
-        <div id="userPanel" class="panel active">
+        <div id="userPanel" class="panel">
             <h2>End User Dashboard</h2>
-            <p>Create an account, view shared resources, and request download permissions.</p>
-            
-            <div style="background: #fafafa; padding: 15px; border: 1px solid #ddd; border-radius: 5px; margin-bottom: 20px;">
-                <h3>User Account Setup</h3>
-                <input type="text" id="regUser" placeholder="Choose Username">
-                <input type="password" id="regPass" placeholder="Choose Password">
-                <button onclick="registerUser()">Save Account</button>
-            </div>
+            <p>Welcome, <span id="welcomeName"></span>! You can open, read, and view all items below. Downloads are restricted until approved by admin.</p>
 
-            <h3>Available Uploads & Links</h3>
+            <h3>Available Uploads & Resources</h3>
             <table id="userFilesTable">
                 <tr>
                     <th>Title</th>
                     <th>Type</th>
                     <th>Uploaded By</th>
-                    <th>Action</th>
+                    <th>Read / Open</th>
+                    <th>Download Status</th>
                 </tr>
             </table>
 
             <!-- Contact Info Section -->
             <div class="contact-box">
                 <h3>Contact Admin</h3>
-                <p>If you need download permissions or have questions, reach out directly:</p>
-                <p><strong>Email:</strong> danielbandari@gmail.com</p>
-                <p><strong>Tel:</strong> 0113696442</p>
+                <p>If you need download permissions or have questions, reach out directly[cite: 1]:</p>
+                <p><strong>Email:</strong> danielbandari@gmail.com[cite: 1]</p>
+                <p><strong>Tel:</strong> 0113696442[cite: 1]</p>
             </div>
         </div>
 
         <!-- ADMIN PANEL -->
         <div id="adminPanel" class="panel">
-            <h2>Admin Dashboard</h2>
-            <p>Welcome Admin (maalim003)! Upload files/links (Max 15MB), manage permissions, and track visits.</p>
-            <button onclick="switchTab('userPanel')" style="margin-bottom: 15px; background-color: #7f8c8d;">Switch Back to User View</button>
+            <h2>Admin Dashboard (maalim003)</h2>
+            <p>Upload files/links (Max 15MB)[cite: 1], manage download permissions, view accounts, and track visits[cite: 1].</p>
 
-            <div style="background: #fafafa; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
-                <h3>Upload New Resource</h3>
-                <input type="text" id="uploadTitle" placeholder="Resource Title/Link Name">
+            <div class="auth-card">
+                <h3>Upload New Resource (Max 15MB)[cite: 1]</h3>
+                <input type="text" id="uploadTitle" placeholder="Resource Title or Link URL">
                 <select id="uploadType">
                     <option value="Note">Note / Document</option>
                     <option value="Link">Web Link</option>
@@ -158,49 +194,29 @@
                 <tr>
                     <th>Title</th>
                     <th>Type</th>
-                    <th>Download Status</th>
+                    <th>Open / Read</th>
+                    <th>Download Permission</th>
                     <th>Actions</th>
                 </tr>
             </table>
 
             <h3>Registered Accounts & Visit Log</h3>
-            <p><strong>Total Visits Recorded:</strong> <span id="visitCount">1</span></p>
+            <p><strong>Total Site Visits:</strong> <span id="visitCount">1</span></p>
             <ul id="accountList"></ul>
         </div>
     </div>
 
     <script>
-        // Tab switching logic
-        function switchTab(panelId) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.getElementById(panelId).classList.add('active');
-        }
-
-        // Admin Authentication Check
-        function promptAdminLogin() {
-            let user = prompt("Enter Admin Username:");
-            if (user === null) return; // Cancelled
-            
-            let pass = prompt("Enter Admin Password:");
-            if (pass === null) return; // Cancelled
-
-            if (user === "maalim003" && pass === "14415") {
-                alert("Access Granted, Welcome Admin!");
-                switchTab('adminPanel');
-            } else {
-                alert("Access Denied: Incorrect Admin Username or Password.");
-            }
-        }
-
         // Local Storage Init
         let resources = JSON.parse(localStorage.getItem('site_resources')) || [
-            { title: "Mathematics Calculus Notes", type: "Note", author: "Admin", allowed: false },
-            { title: "Python Programming Tutorial", type: "Video", author: "Admin", allowed: true }
+            { title: "Mathematics Calculus Notes", type: "Note", author: "maalim003", allowed: false, content: "https://example.com/sample-notes.pdf" },
+            { title: "Python Programming Tutorial", type: "Video", author: "maalim003", allowed: true, content: "https://www.youtube.com/watch?v=example" }
         ];
         
-        let users = JSON.parse(localStorage.getItem('site_users')) || ["Student_1", "User_Test"];
+        let users = JSON.parse(localStorage.getItem('site_users')) || { "student1": "password123" };
+        let activeSession = JSON.parse(localStorage.getItem('active_session')) || null;
 
-        // Track Visit
+        // Track Visits
         let visits = localStorage.getItem('site_visits') || 1;
         if(!sessionStorage.getItem('visited')) {
             visits++;
@@ -209,88 +225,193 @@
         }
         document.getElementById('visitCount').innerText = visits;
 
-        function renderTables() {
+        // Initialize state on load
+        checkSession();
+
+        function switchPanel(panelId) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.getElementById(panelId).classList.add('active');
+        }
+
+        function registerUser() {
+            let u = document.getElementById('regUser').value.trim();
+            let p = document.getElementById('regPass').value.trim();
+
+            if(!u || !p) {
+                alert("Please fill in both username and password.");
+                return;
+            }
+            if(users[u] || u === "maalim003") {
+                alert("Username already exists. Choose another.");
+                return;
+            }
+
+            users[u] = p;
+            localStorage.setItem('site_users', JSON.stringify(users));
+            alert("Account created successfully! You can now log in.");
+            document.getElementById('regUser').value = '';
+            document.getElementById('regPass').value = '';
+            renderLists();
+        }
+
+        function login() {
+            let u = document.getElementById('loginUser').value.trim();
+            let p = document.getElementById('loginPass').value.trim();
+
+            // Admin Check
+            if(u === "maalim003" && p === "14415") {
+                activeSession = { username: "maalim003", role: "admin" };
+                localStorage.setItem('active_session', JSON.stringify(activeSession));
+                alert("Welcome back, Admin!");
+                checkSession();
+                return;
+            }
+
+            // End User Check
+            if(users[u] && users[u] === p) {
+                activeSession = { username: u, role: "user" };
+                localStorage.setItem('active_session', JSON.stringify(activeSession));
+                alert("Login successful!");
+                checkSession();
+                return;
+            }
+
+            alert("Invalid username or password.");
+        }
+
+        function logout() {
+            activeSession = null;
+            localStorage.removeItem('active_session');
+            checkSession();
+        }
+
+        function checkSession() {
+            let statusDisplay = document.getElementById('currentUserDisplay');
+            let navUserBtn = document.getElementById('navUserBtn');
+            let navAdminBtn = document.getElementById('navAdminBtn');
+            let logoutBtn = document.getElementById('logoutBtn');
+
+            if(activeSession) {
+                logoutBtn.style.display = "inline-block";
+                if(activeSession.role === "admin") {
+                    statusDisplay.innerText = "Logged in as: Admin (maalim003)";
+                    navUserBtn.style.display = "inline-block";
+                    navAdminBtn.style.display = "inline-block";
+                    switchPanel('adminPanel');
+                } else {
+                    statusDisplay.innerText = "Logged in as: " + activeSession.username;
+                    document.getElementById('welcomeName').innerText = activeSession.username;
+                    navUserBtn.style.display = "inline-block";
+                    navAdminBtn.style.display = "none";
+                    switchPanel('userPanel');
+                }
+            } else {
+                statusDisplay.innerText = "Status: Not Logged In";
+                navUserBtn.style.display = "none";
+                navAdminBtn.style.display = "none";
+                logoutBtn.style.display = "none";
+                switchPanel('authPanel');
+            }
+            renderLists();
+        }
+
+        function openResource(index) {
+            let res = resources[index];
+            // Opens the link or note content in a new tab for reading/viewing
+            if(res.content && res.content.startsWith('http')) {
+                window.open(res.content, '_blank');
+            } else {
+                alert("Opening Resource: " + res.title + "\n\nContent preview: " + (res.content || "Standard uploaded study material."));
+            }
+        }
+
+        function renderLists() {
             // User Table
             let userTable = document.getElementById('userFilesTable');
-            userTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Uploaded By</th><th>Action</th></tr>`;
+            userTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Uploaded By</th><th>Read / Open</th><th>Download Status</th></tr>`;
             resources.forEach((res, index) => {
-                let actionBtn = res.allowed 
-                    ? `<button onclick="alert('Downloading file...')">Download</button>` 
-                    : `<span style="color: gray;">Pending Admin Approval</span>`;
-                userTable.innerHTML += `<tr><td>${res.title}</td><td>${res.type}</td><td>${res.author}</td><td>${actionBtn}</td></tr>`;
+                let downloadAction = res.allowed 
+                    ? `<button class="success" onclick="alert('Downloading file...')">Download</button>` 
+                    : `<span style="color: gray; font-style: italic;">Locked (Awaiting Admin Permission)</span>`;
+                
+                userTable.innerHTML += `<tr>
+                    <td>${res.title}</td>
+                    <td>${res.type}</td>
+                    <td>${res.author}</td>
+                    <td><button onclick="openResource(${index})">Open & Read</button></td>
+                    <td>${downloadAction}</td>
+                </tr>`;
             });
 
             // Admin Table
             let adminTable = document.getElementById('adminFilesTable');
-            adminTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Download Status</th><th>Actions</th></tr>`;
+            adminTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Open / Read</th><th>Download Permission</th><th>Actions</th></tr>`;
             resources.forEach((res, index) => {
                 let toggleText = res.allowed ? "Revoke Download" : "Allow Download";
+                let toggleClass = res.allowed ? "danger" : "success";
                 adminTable.innerHTML += `<tr>
                     <td>${res.title}</td>
                     <td>${res.type}</td>
-                    <td>${res.allowed ? "Allowed" : "Restricted"}</td>
+                    <td><button onclick="openResource(${index})">Open & Read</button></td>
+                    <td>${res.allowed ? "Allowed to Download" : "Restricted"}</td>
                     <td>
-                        <button onclick="togglePermission(${index})">${toggleText}</button>
+                        <button class="${toggleClass}" onclick="togglePermission(${index})">${toggleText}</button>
                         <button class="danger" onclick="deleteResource(${index})">Delete</button>
                     </td>
                 </tr>`;
             });
 
-            // Users List
+            // Registered Users List
             let userListUl = document.getElementById('accountList');
             userListUl.innerHTML = "";
-            users.forEach(u => {
-                userListUl.innerHTML += `<li>${u}</li>`;
+            Object.keys(users).forEach(u => {
+                userListUl.innerHTML += `<li>End User: ${u}</li>`;
             });
         }
 
-        function registerUser() {
-            let uname = document.getElementById('regUser').value;
-            if(uname) {
-                users.push(uname);
-                localStorage.setItem('site_users', JSON.stringify(users));
-                alert("Account saved successfully!");
-                document.getElementById('regUser').value = '';
-                document.getElementById('regPass').value = '';
-                renderTables();
-            }
-        }
-
         function adminUpload() {
-            let title = document.getElementById('uploadTitle').value;
+            let title = document.getElementById('uploadTitle').value.trim();
             let type = document.getElementById('uploadType').value;
             let fileInput = document.getElementById('uploadFile');
+
+            if(!title) {
+                alert("Please provide a title or link name.");
+                return;
+            }
 
             if(fileInput.files.length > 0) {
                 let fileSizeMB = fileInput.files[0].size / (1024*1024);
                 if(fileSizeMB > 15) {
-                    alert("File size exceeds 15MB limit!");
+                    alert("File size exceeds the 15MB limit!");[cite: 1]
                     return;
                 }
             }
 
-            if(title) {
-                resources.push({ title: title, type: type, author: "Admin", allowed: false });
-                localStorage.setItem('site_resources', JSON.stringify(resources));
-                document.getElementById('uploadTitle').value = '';
-                renderTables();
-                alert("Resource uploaded successfully!");
-            }
+            resources.push({ 
+                title: title, 
+                type: type, 
+                author: "maalim003", 
+                allowed: false, 
+                content: fileInput.files.length > 0 ? URL.createObjectURL(fileInput.files[0]) : title 
+            });
+            localStorage.setItem('site_resources', JSON.stringify(resources));
+            document.getElementById('uploadTitle').value = '';
+            document.getElementById('uploadFile').value = '';
+            renderLists();
+            alert("Resource uploaded successfully!");
         }
 
         function togglePermission(index) {
             resources[index].allowed = !resources[index].allowed;
             localStorage.setItem('site_resources', JSON.stringify(resources));
-            renderTables();
+            renderLists();
         }
 
         function deleteResource(index) {
             resources.splice(index, 1);
             localStorage.setItem('site_resources', JSON.stringify(resources));
-            renderTables();
+            renderLists();
         }
-
-        renderTables();
     </script>
 </body>
 </html>
