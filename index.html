@@ -165,19 +165,19 @@
             <!-- Contact Info Section -->
             <div class="contact-box">
                 <h3>Contact Admin</h3>
-                <p>If you need download permissions or have questions, reach out directly[cite: 1]:</p>
-                <p><strong>Email:</strong> danielbandari@gmail.com[cite: 1]</p>
-                <p><strong>Tel:</strong> 0113696442[cite: 1]</p>
+                <p>If you need download permissions or have questions, reach out directly:</p>
+                <p><strong>Email:</strong> danielbandari@gmail.com</p>
+                <p><strong>Tel:</strong> 0113696442</p>
             </div>
         </div>
 
         <!-- ADMIN PANEL -->
         <div id="adminPanel" class="panel">
             <h2>Admin Dashboard (maalim003)</h2>
-            <p>Full control panel: Upload items up to 15MB[cite: 1], manage download permissions, view registered accounts, and check visit history[cite: 1].</p>
+            <p>Full control panel: Upload items up to 15MB, manage download permissions, view registered accounts, and check visit history.</p>
 
             <div class="auth-card">
-                <h3>Upload New Resource (Admin Upload Limit: 15MB)[cite: 1]</h3>
+                <h3>Upload New Resource (Admin Upload Limit: 15MB)</h3>
                 <input type="text" id="uploadTitle" placeholder="Resource Title or Link URL">
                 <select id="uploadType">
                     <option value="Note">Note / Document</option>
@@ -230,7 +230,10 @@
 
         function switchPanel(panelId) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            document.getElementById(panelId).classList.add('active');
+            let target = document.getElementById(panelId);
+            if(target) {
+                target.classList.add('active');
+            }
         }
 
         function registerUser() {
@@ -249,12 +252,12 @@
             users[u] = p;
             localStorage.setItem('site_users', JSON.stringify(users));
             
-            // Notification explicitly set as requested
+            // Notification message requested
             alert("account set successfully");
 
             document.getElementById('regUser').value = '';
             document.getElementById('regPass').value = '';
-            checkSession();
+            renderLists();
         }
 
         function login() {
@@ -303,7 +306,8 @@
                     switchPanel('adminPanel');
                 } else {
                     statusDisplay.innerText = "Logged in as: " + activeSession.username;
-                    document.getElementById('welcomeName').innerText = activeSession.username;
+                    let welcomeEl = document.getElementById('welcomeName');
+                    if(welcomeEl) welcomeEl.innerText = activeSession.username;
                     navUserBtn.style.display = "inline-block";
                     navAdminBtn.style.display = "none";
                     switchPanel('userPanel');
@@ -330,45 +334,51 @@
         function renderLists() {
             // User Table
             let userTable = document.getElementById('userFilesTable');
-            userTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Uploaded By</th><th>Open & Read</th><th>Download Status</th></tr>`;
-            resources.forEach((res, index) => {
-                let downloadAction = res.allowed 
-                    ? `<button class="success" onclick="alert('Downloading file...')">Download</button>` 
-                    : `<span style="color: gray; font-style: italic;">Locked (Awaiting Admin Permission)</span>`;
-                
-                userTable.innerHTML += `<tr>
-                    <td>${res.title}</td>
-                    <td>${res.type}</td>
-                    <td>${res.author}</td>
-                    <td><button onclick="openResource(${index})">Open & Read</button></td>
-                    <td>${downloadAction}</td>
-                </tr>`;
-            });
+            if(userTable) {
+                userTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Uploaded By</th><th>Open & Read</th><th>Download Status</th></tr>`;
+                resources.forEach((res, index) => {
+                    let downloadAction = res.allowed 
+                        ? `<button class="success" onclick="alert('Downloading file...')">Download</button>` 
+                        : `<span style="color: gray; font-style: italic;">Locked (Awaiting Admin Permission)</span>`;
+                    
+                    userTable.innerHTML += `<tr>
+                        <td>${res.title}</td>
+                        <td>${res.type}</td>
+                        <td>${res.author}</td>
+                        <td><button onclick="openResource(${index})">Open & Read</button></td>
+                        <td>${downloadAction}</td>
+                    </tr>`;
+                });
+            }
 
             // Admin Table
             let adminTable = document.getElementById('adminFilesTable');
-            adminTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Open & Read</th><th>Download Permission</th><th>Actions</th></tr>`;
-            resources.forEach((res, index) => {
-                let toggleText = res.allowed ? "Revoke Download" : "Allow Download";
-                let toggleClass = res.allowed ? "danger" : "success";
-                adminTable.innerHTML += `<tr>
-                    <td>${res.title}</td>
-                    <td>${res.type}</td>
-                    <td><button onclick="openResource(${index})">Open & Read</button></td>
-                    <td>${res.allowed ? "Allowed to Download" : "Restricted"}</td>
-                    <td>
-                        <button class="${toggleClass}" onclick="togglePermission(${index})">${toggleText}</button>
-                        <button class="danger" onclick="deleteResource(${index})">Delete</button>
-                    </td>
-                </tr>`;
-            });
+            if(adminTable) {
+                adminTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Open & Read</th><th>Download Permission</th><th>Actions</th></tr>`;
+                resources.forEach((res, index) => {
+                    let toggleText = res.allowed ? "Revoke Download" : "Allow Download";
+                    let toggleClass = res.allowed ? "danger" : "success";
+                    adminTable.innerHTML += `<tr>
+                        <td>${res.title}</td>
+                        <td>${res.type}</td>
+                        <td><button onclick="openResource(${index})">Open & Read</button></td>
+                        <td>${res.allowed ? "Allowed to Download" : "Restricted"}</td>
+                        <td>
+                            <button class="${toggleClass}" onclick="togglePermission(${index})">${toggleText}</button>
+                            <button class="danger" onclick="deleteResource(${index})">Delete</button>
+                        </td>
+                    </tr>`;
+                });
+            }
 
             // Registered Users List
             let userListUl = document.getElementById('accountList');
-            userListUl.innerHTML = "";
-            Object.keys(users).forEach(u => {
-                userListUl.innerHTML += `<li>Registered User: ${u}</li>`;
-            });
+            if(userListUl) {
+                userListUl.innerHTML = "";
+                Object.keys(users).forEach(u => {
+                    userListUl.innerHTML += `<li>Registered User: ${u}</li>`;
+                });
+            }
         }
 
         function adminUpload() {
@@ -384,7 +394,7 @@
             if(fileInput.files.length > 0) {
                 let fileSizeMB = fileInput.files[0].size / (1024*1024);
                 if(fileSizeMB > 15) {
-                    alert("File size exceeds the 15MB limit!");[cite: 1]
+                    alert("File size exceeds the 15MB limit!");
                     return;
                 }
             }
