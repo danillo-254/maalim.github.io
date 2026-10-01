@@ -91,6 +91,25 @@
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+        .password-container {
+            position: relative;
+        }
+        .password-container input {
+            padding-right: 40px;
+        }
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 35%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            background: none;
+            border: none;
+            padding: 0;
+            font-weight: normal;
+        }
         table {
             width: 100%;
             border-collapse: collapse;
@@ -183,7 +202,10 @@
                 <div class="auth-card" style="flex: 1; min-width: 280px;">
                     <h3>User / Admin Log In</h3>
                     <input type="text" id="loginUser" placeholder="Username">
-                    <input type="password" id="loginPass" placeholder="Password">
+                    <div class="password-container">
+                        <input type="password" id="loginPass" placeholder="Password">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPass', this)">👁️</button>
+                    </div>
                     <button class="success" onclick="login()">Log In</button>
                 </div>
 
@@ -191,7 +213,10 @@
                 <div class="auth-card" style="flex: 1; min-width: 280px;">
                     <h3>Create End User Account</h3>
                     <input type="text" id="regUser" placeholder="Choose Username">
-                    <input type="password" id="regPass" placeholder="Choose Password">
+                    <div class="password-container">
+                        <input type="password" id="regPass" placeholder="Choose Password">
+                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('regPass', this)">👁️</button>
+                    </div>
                     <button onclick="registerUser()">Register Account</button>
                 </div>
 
@@ -244,6 +269,7 @@
                     <option value="Audio">Audio</option>
                     <option value="Link">Web Link</option>
                 </select>
+                <textarea id="uploadTextContent" placeholder="Paste Note/Document text content or description here (Recommended for reliable storage)" rows="4"></textarea>
                 <input type="file" id="uploadFile">
                 <button onclick="adminUpload()">Upload Resource</button>
             </div>
@@ -278,7 +304,7 @@
         // Local Storage Init
         let resources = JSON.parse(localStorage.getItem('site_resources')) || [
             { title: "Calculus Formula Sheet", type: "Note", author: "maalim003", allowed: false, url: "", contentText: "Derivative of x^n is n*x^(n-1). Integral of x^n is (x^(n+1))/(n+1)." },
-            { title: "Python Tutorial Video", type: "Video", author: "maalim003", allowed: true, url: "https://www.w3schools.com/html/mov_bbb.mp4", contentText: "" },
+            { title: "Python Tutorial Video", type: "Video", author: "maalim003", allowed: true, url: "https://www.w3schools.com/html/mov_bbb.mp4", contentText: "Sample Python video tutorial source." },
             { title: "Educational Portal Link", type: "Link", author: "maalim003", allowed: true, url: "https://github.com", contentText: "" }
         ];
         
@@ -296,6 +322,17 @@
 
         // Initialize state on load
         checkSession();
+
+        function togglePasswordVisibility(fieldId, btn) {
+            let passwordInput = document.getElementById(fieldId);
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                btn.textContent = "🙈";
+            } else {
+                passwordInput.type = "password";
+                btn.textContent = "👁️";
+            }
+        }
 
         function switchPanel(panelId) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
@@ -321,7 +358,7 @@
             users[u] = p;
             localStorage.setItem('site_users', JSON.stringify(users));
             
-            alert("account set successfully");
+            alert("Account set successfully!");
 
             document.getElementById('regUser').value = '';
             document.getElementById('regPass').value = '';
@@ -390,7 +427,7 @@
             renderLists();
         }
 
-        // Open and read resource seamlessly according to its exact type on both ends
+        // Open and read resource seamlessly according to its exact type
         function openResource(index) {
             let res = resources[index];
             let modal = document.getElementById('mediaModal');
@@ -406,12 +443,18 @@
             } else if (res.type === "Image") {
                 let img = document.createElement('img');
                 img.src = res.url;
+                img.onerror = function() {
+                    modalBody.innerHTML = `<p style="color:red;">Image could not be loaded. URL/File might be missing.</p><p>Saved Content/Link: <a href="${res.url}" target="_blank">${res.url}</a></p>`;
+                };
                 modalBody.appendChild(img);
             } else if (res.type === "Video") {
                 let video = document.createElement('video');
                 video.src = res.url;
                 video.controls = true;
                 video.autoplay = true;
+                video.onerror = function() {
+                    modalBody.innerHTML = `<p style="color:red;">Video could not be played directly.</p><p>Direct Link: <a href="${res.url}" target="_blank">${res.url}</a></p>`;
+                };
                 modalBody.appendChild(video);
             } else if (res.type === "Audio") {
                 let audio = document.createElement('audio');
@@ -428,15 +471,9 @@
                 textDiv.style.border = "1px solid #ddd";
                 textDiv.style.borderRadius = "4px";
                 
-                // If it's a real uploaded PDF/file URL, render an iframe reader or direct text block
-                if (res.url && res.url.startsWith("blob:")) {
-                    let iframe = document.createElement('iframe');
-                    iframe.src = res.url;
-                    modalBody.appendChild(iframe);
-                } else {
-                    textDiv.innerHTML = `<h4>Document / Note Content:</h4><p style="white-space: pre-wrap; line-height: 1.5;">${res.contentText || "No text content available."}</p>`;
-                    modalBody.appendChild(textDiv);
-                }
+                let displayContent = res.contentText || res.url || "No text content available.";
+                textDiv.innerHTML = `<h4>Document / Note Content:</h4><p style="white-space: pre-wrap; line-height: 1.5;">${displayContent}</p>`;
+                modalBody.appendChild(textDiv);
             }
 
             modal.style.display = "flex";
@@ -454,7 +491,7 @@
                 userTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Uploaded By</th><th>Open & Read</th><th>Download Status</th></tr>`;
                 resources.forEach((res, index) => {
                     let downloadAction = res.allowed 
-                        ? `<button class="success" onclick="window.open('${res.url}', '_blank')">Download</button>` 
+                        ? `<button class="success" onclick="window.open('${res.url || '#'}', '_blank')">Download</button>` 
                         : `<span style="color: gray; font-style: italic;">Locked (Awaiting Admin Permission)</span>`;
                     
                     userTable.innerHTML += `<tr>
@@ -500,6 +537,7 @@
         function adminUpload() {
             let title = document.getElementById('uploadTitle').value.trim();
             let type = document.getElementById('uploadType').value;
+            let textContentInput = document.getElementById('uploadTextContent').value.trim();
             let fileInput = document.getElementById('uploadFile');
 
             if(!title) {
@@ -507,8 +545,8 @@
                 return;
             }
 
-            let fileUrl = "";
-            let contentText = "";
+            let fileUrl = title; 
+            let contentText = textContentInput || "Uploaded study material content.";
 
             if(fileInput.files.length > 0) {
                 let file = fileInput.files[0];
@@ -517,26 +555,35 @@
                     alert("File size exceeds the 30MB limit!");
                     return;
                 }
-                fileUrl = URL.createObjectURL(file);
-                contentText = file.name;
-            } else {
-                fileUrl = title; // If it's a web link
+                // Use FileReader to store file content permanently in localStorage (Base64)
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    fileUrl = e.target.result; // Data URL persists across refreshes
+                    saveResourceToStorage(title, type, fileUrl, contentText || file.name);
+                };
+                reader.readAsDataURL(file);
+                return;
             }
 
+            saveResourceToStorage(title, type, fileUrl, contentText);
+        }
+
+        function saveResourceToStorage(title, type, fileUrl, contentText) {
             resources.push({ 
                 title: title, 
                 type: type, 
                 author: "maalim003", 
                 allowed: false, 
                 url: fileUrl,
-                contentText: contentText || "Uploaded study material content."
+                contentText: contentText
             });
             
             localStorage.setItem('site_resources', JSON.stringify(resources));
             document.getElementById('uploadTitle').value = '';
+            document.getElementById('uploadTextContent').value = '';
             document.getElementById('uploadFile').value = '';
             renderLists();
-            alert("Resource uploaded successfully!");
+            alert("Resource uploaded successfully and saved permanently!");
         }
 
         function togglePermission(index) {
