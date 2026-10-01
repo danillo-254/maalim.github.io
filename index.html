@@ -102,13 +102,43 @@
             border-radius: 5px;
             margin-bottom: 20px;
         }
+        /* Modal Viewer Styling */
+        #mediaModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--white);
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 700px;
+            width: 90%;
+            position: relative;
+            max-height: 85vh;
+            overflow-y: auto;
+            text-align: center;
+        }
+        .modal-content img, .modal-content video {
+            max-width: 100%;
+            max-height: 50vh;
+            border-radius: 4px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
 
     <header>
         <h1>Resource & Study Platform</h1>
-        <p>Access notes, links, videos, and audio securely.</p>
+        <p>Access notes, links, videos, images, and audio securely.</p>
     </header>
 
     <div class="container">
@@ -149,7 +179,7 @@
         <!-- END USER PANEL -->
         <div id="userPanel" class="panel">
             <h2>End User Dashboard</h2>
-            <p>Welcome, <span id="welcomeName"></span>! You can open, read, and view all uploaded items below. Downloads remain locked until approved by the admin.</p>
+            <p>Welcome, <span id="welcomeName"></span>! You can open, read, and view all uploaded items below according to their type. Downloads remain locked until approved by the admin.</p>
 
             <h3>Available Uploads & Resources</h3>
             <table id="userFilesTable">
@@ -177,13 +207,14 @@
             <p>Full control panel: Upload items up to 15MB, manage download permissions, view registered accounts, and check visit history.</p>
 
             <div class="auth-card">
-                <h3>Upload New Resource (Admin Upload Limit: 15MB)</h3>
+                <h3>Upload New Resource (Admin Limit: 15MB)</h3>
                 <input type="text" id="uploadTitle" placeholder="Resource Title or Link URL">
                 <select id="uploadType">
-                    <option value="Note">Note / Document</option>
-                    <option value="Link">Web Link</option>
+                    <option value="Note">Note / Document / PDF</option>
+                    <option value="Image">Image</option>
                     <option value="Video">Video</option>
                     <option value="Audio">Audio</option>
+                    <option value="Link">Web Link</option>
                 </select>
                 <input type="file" id="uploadFile">
                 <button onclick="adminUpload()">Upload Resource</button>
@@ -206,11 +237,21 @@
         </div>
     </div>
 
+    <!-- MEDIA VIEWER MODAL -->
+    <div id="mediaModal">
+        <div class="modal-content">
+            <button class="danger" onclick="closeModal()" style="float: right; padding: 5px 10px;">Close X</button>
+            <h3 id="modalTitle" style="margin-top: 10px;">Resource Viewer</h3>
+            <div id="modalBody" style="margin-top: 15px; text-align: center;"></div>
+        </div>
+    </div>
+
     <script>
         // Local Storage Init
         let resources = JSON.parse(localStorage.getItem('site_resources')) || [
-            { title: "Mathematics Calculus Notes", type: "Note", author: "maalim003", allowed: false, content: "https://example.com/sample-notes.pdf" },
-            { title: "Python Programming Tutorial", type: "Video", author: "maalim003", allowed: true, content: "https://www.youtube.com/watch?v=example" }
+            { title: "Calculus Formula Sheet", type: "Note", author: "maalim003", allowed: false, url: "", contentText: "Derivative of x^n is n*x^(n-1). Integral of x^n is (x^(n+1))/(n+1)." },
+            { title: "Python Tutorial Video", type: "Video", author: "maalim003", allowed: true, url: "https://www.w3schools.com/html/mov_bbb.mp4", contentText: "" },
+            { title: "Educational Portal Link", type: "Link", author: "maalim003", allowed: true, url: "https://github.com", contentText: "" }
         ];
         
         let users = JSON.parse(localStorage.getItem('site_users')) || { "student1": "password123" };
@@ -252,7 +293,6 @@
             users[u] = p;
             localStorage.setItem('site_users', JSON.stringify(users));
             
-            // Notification message requested
             alert("account set successfully");
 
             document.getElementById('regUser').value = '';
@@ -322,13 +362,53 @@
             renderLists();
         }
 
+        // Open and read resource according to its exact type
         function openResource(index) {
             let res = resources[index];
-            if(res.content && res.content.startsWith('http')) {
-                window.open(res.content, '_blank');
+            let modal = document.getElementById('mediaModal');
+            let modalTitle = document.getElementById('modalTitle');
+            let modalBody = document.getElementById('modalBody');
+
+            modalTitle.innerText = res.title + " (" + res.type + ")";
+            modalBody.innerHTML = ""; // Clear previous content
+
+            if (res.type === "Link") {
+                window.open(res.url, '_blank');
+                return;
+            } else if (res.type === "Image") {
+                let img = document.createElement('img');
+                img.src = res.url;
+                modalBody.appendChild(img);
+            } else if (res.type === "Video") {
+                let video = document.createElement('video');
+                video.src = res.url;
+                video.controls = true;
+                video.autoplay = true;
+                modalBody.appendChild(video);
+            } else if (res.type === "Audio") {
+                let audio = document.createElement('audio');
+                audio.src = res.url;
+                audio.controls = true;
+                audio.autoplay = true;
+                modalBody.appendChild(audio);
             } else {
-                alert("Opening Resource: " + res.title + "\n\nContent preview: " + (res.content || "Standard uploaded study material."));
+                // Note / Document / PDF text reader view
+                let textDiv = document.createElement('div');
+                textDiv.style.textAlign = "left";
+                textDiv.style.padding = "10px";
+                textDiv.style.background = "#f9f9f9";
+                textDiv.style.border = "1px solid #ddd";
+                textDiv.style.borderRadius = "4px";
+                textDiv.innerHTML = `<h4>Document Content:</h4><p>${res.contentText || "Sample note or document text content for reading."}</p>`;
+                modalBody.appendChild(textDiv);
             }
+
+            modal.style.display = "flex";
+        }
+
+        function closeModal() {
+            document.getElementById('mediaModal').style.display = "none";
+            document.getElementById('modalBody').innerHTML = ""; // Stop audio/video playback
         }
 
         function renderLists() {
@@ -387,16 +467,24 @@
             let fileInput = document.getElementById('uploadFile');
 
             if(!title) {
-                alert("Please provide a title or link name.");
+                alert("Please provide a title or link URL.");
                 return;
             }
 
+            let fileUrl = "";
+            let contentText = "";
+
             if(fileInput.files.length > 0) {
-                let fileSizeMB = fileInput.files[0].size / (1024*1024);
+                let file = fileInput.files[0];
+                let fileSizeMB = file.size / (1024*1024);
                 if(fileSizeMB > 15) {
                     alert("File size exceeds the 15MB limit!");
                     return;
                 }
+                fileUrl = URL.createObjectURL(file);
+                contentText = file.name;
+            } else {
+                fileUrl = title; // If it's a web link or text note
             }
 
             resources.push({ 
@@ -404,8 +492,10 @@
                 type: type, 
                 author: "maalim003", 
                 allowed: false, 
-                content: fileInput.files.length > 0 ? URL.createObjectURL(fileInput.files[0]) : title 
+                url: fileUrl,
+                contentText: contentText || "Uploaded study material content."
             });
+            
             localStorage.setItem('site_resources', JSON.stringify(resources));
             document.getElementById('uploadTitle').value = '';
             document.getElementById('uploadFile').value = '';
