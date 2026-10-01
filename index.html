@@ -149,7 +149,7 @@
         <!-- END USER PANEL -->
         <div id="userPanel" class="panel">
             <h2>End User Dashboard</h2>
-            <p>Welcome, <span id="welcomeName"></span>! You can open, read, and view all items below. Downloads are restricted until approved by admin.</p>
+            <p>Welcome, <span id="welcomeName"></span>! You can open, read, and view all uploaded items below. Downloads remain locked until approved by the admin.</p>
 
             <h3>Available Uploads & Resources</h3>
             <table id="userFilesTable">
@@ -157,7 +157,7 @@
                     <th>Title</th>
                     <th>Type</th>
                     <th>Uploaded By</th>
-                    <th>Read / Open</th>
+                    <th>Open & Read</th>
                     <th>Download Status</th>
                 </tr>
             </table>
@@ -174,10 +174,10 @@
         <!-- ADMIN PANEL -->
         <div id="adminPanel" class="panel">
             <h2>Admin Dashboard (maalim003)</h2>
-            <p>Upload files/links (Max 15MB)[cite: 1], manage download permissions, view accounts, and track visits[cite: 1].</p>
+            <p>Full control panel: Upload items up to 15MB[cite: 1], manage download permissions, view registered accounts, and check visit history[cite: 1].</p>
 
             <div class="auth-card">
-                <h3>Upload New Resource (Max 15MB)[cite: 1]</h3>
+                <h3>Upload New Resource (Admin Upload Limit: 15MB)[cite: 1]</h3>
                 <input type="text" id="uploadTitle" placeholder="Resource Title or Link URL">
                 <select id="uploadType">
                     <option value="Note">Note / Document</option>
@@ -194,7 +194,7 @@
                 <tr>
                     <th>Title</th>
                     <th>Type</th>
-                    <th>Open / Read</th>
+                    <th>Open & Read</th>
                     <th>Download Permission</th>
                     <th>Actions</th>
                 </tr>
@@ -248,10 +248,13 @@
 
             users[u] = p;
             localStorage.setItem('site_users', JSON.stringify(users));
-            alert("Account created successfully! You can now log in.");
+            
+            // Notification explicitly set as requested
+            alert("account set successfully");
+
             document.getElementById('regUser').value = '';
             document.getElementById('regPass').value = '';
-            renderLists();
+            checkSession();
         }
 
         function login() {
@@ -317,7 +320,6 @@
 
         function openResource(index) {
             let res = resources[index];
-            // Opens the link or note content in a new tab for reading/viewing
             if(res.content && res.content.startsWith('http')) {
                 window.open(res.content, '_blank');
             } else {
@@ -328,7 +330,7 @@
         function renderLists() {
             // User Table
             let userTable = document.getElementById('userFilesTable');
-            userTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Uploaded By</th><th>Read / Open</th><th>Download Status</th></tr>`;
+            userTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Uploaded By</th><th>Open & Read</th><th>Download Status</th></tr>`;
             resources.forEach((res, index) => {
                 let downloadAction = res.allowed 
                     ? `<button class="success" onclick="alert('Downloading file...')">Download</button>` 
@@ -345,7 +347,7 @@
 
             // Admin Table
             let adminTable = document.getElementById('adminFilesTable');
-            adminTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Open / Read</th><th>Download Permission</th><th>Actions</th></tr>`;
+            adminTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Open & Read</th><th>Download Permission</th><th>Actions</th></tr>`;
             resources.forEach((res, index) => {
                 let toggleText = res.allowed ? "Revoke Download" : "Allow Download";
                 let toggleClass = res.allowed ? "danger" : "success";
@@ -365,7 +367,7 @@
             let userListUl = document.getElementById('accountList');
             userListUl.innerHTML = "";
             Object.keys(users).forEach(u => {
-                userListUl.innerHTML += `<li>End User: ${u}</li>`;
+                userListUl.innerHTML += `<li>Registered User: ${u}</li>`;
             });
         }
 
