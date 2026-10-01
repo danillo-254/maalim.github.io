@@ -97,10 +97,10 @@
     </header>
 
     <div class="container">
-        <!-- Role Switcher Simulation -->
+        <!-- Navigation Buttons -->
         <div class="nav-buttons">
             <button onclick="switchTab('userPanel')">End User View</button>
-            <button onclick="switchTab('adminPanel')">Admin View</button>
+            <button onclick="promptAdminLogin()">Admin Login</button>
         </div>
 
         <!-- END USER PANEL -->
@@ -137,7 +137,8 @@
         <!-- ADMIN PANEL -->
         <div id="adminPanel" class="panel">
             <h2>Admin Dashboard</h2>
-            <p>Upload files/links (Max 15MB), manage permissions, and track visits.</p>
+            <p>Welcome Admin (maalim003)! Upload files/links (Max 15MB), manage permissions, and track visits.</p>
+            <button onclick="switchTab('userPanel')" style="margin-bottom: 15px; background-color: #7f8c8d;">Switch Back to User View</button>
 
             <div style="background: #fafafa; padding: 15px; border: 1px solid #ddd; border-radius: 5px;">
                 <h3>Upload New Resource</h3>
@@ -173,6 +174,22 @@
         function switchTab(panelId) {
             document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
             document.getElementById(panelId).classList.add('active');
+        }
+
+        // Admin Authentication Check
+        function promptAdminLogin() {
+            let user = prompt("Enter Admin Username:");
+            if (user === null) return; // Cancelled
+            
+            let pass = prompt("Enter Admin Password:");
+            if (pass === null) return; // Cancelled
+
+            if (user === "maalim003" && pass === "14415") {
+                alert("Access Granted, Welcome Admin!");
+                switchTab('adminPanel');
+            } else {
+                alert("Access Denied: Incorrect Admin Username or Password.");
+            }
         }
 
         // Local Storage Init
