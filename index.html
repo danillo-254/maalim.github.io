@@ -29,28 +29,52 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Font Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     <style>
         body { font-family: 'Inter', sans-serif; }
         .glass {
-            background: rgba(255, 255, 255, 0.85);
+            background: rgba(255, 255, 255, 0.88);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(229, 231, 235, 0.5);
+            border: 1px solid rgba(229, 231, 235, 0.6);
         }
         .dark .glass {
-            background: rgba(17, 24, 39, 0.85);
-            border: 1px solid rgba(55, 65, 81, 0.5);
+            background: rgba(17, 24, 39, 0.88);
+            border: 1px solid rgba(55, 65, 81, 0.6);
         }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
+        /* 3D Flashcard Flip Effect */
+        .flip-card {
+            perspective: 1000px;
+        }
+        .flip-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flip-card.flipped .flip-card-inner {
+            transform: rotateY(180deg);
+        }
+        .flip-card-front, .flip-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 1rem;
+        }
+        .flip-card-back {
+            transform: rotateY(180deg);
+        }
     </style>
 </head>
 <body class="bg-gradient-to-br from-emerald-50 via-slate-50 to-blue-50 dark:from-gray-900 dark:via-gray-900 dark:to-slate-900 text-gray-800 dark:text-gray-100 min-h-full flex flex-col">
 
-    <!-- Top Notification / Announcement Banner -->
+    <!-- Announcement Banner -->
     <div id="announcement-banner" class="bg-emerald-600 text-white text-xs sm:text-sm py-2 px-4 text-center font-medium shadow-inner flex items-center justify-center space-x-2">
         <i class="fa-solid fa-bullhorn animate-bounce"></i>
-        <span id="banner-text">Welcome to Maalim-Kenya Education Hub! Empowering learners in Mathematics & Computer Studies.</span>
+        <span id="banner-text">Welcome to Maalim-Kenya Education Hub! Lead Instructor: Daniel Chiro Bandari.</span>
     </div>
 
     <!-- Header & Navigation -->
@@ -61,7 +85,7 @@
                 <!-- Logo & Brand -->
                 <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
                     <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-emerald-500 shadow-md">
-                        <img id="admin-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Admin Daniel Chiro Bandari" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/150x150/16a34a/ffffff?text=DCB'">
+                        <img id="header-admin-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Admin" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/150x150/16a34a/ffffff?text=DCB'">
                     </div>
                     <div>
                         <h1 class="font-bold text-base sm:text-lg tracking-tight text-emerald-700 dark:text-emerald-400 leading-tight">MAALIM-KENYA</h1>
@@ -71,388 +95,452 @@
 
                 <!-- Desktop Navigation Tabs -->
                 <nav class="hidden lg:flex items-center space-x-1">
-                    <button onclick="switchTab('home')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-emerald-50 dark:hover:bg-gray-800 text-emerald-600 dark:text-emerald-400" data-tab="home">
+                    <button onclick="switchTab('home')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-emerald-600 bg-emerald-50 dark:bg-gray-800" data-tab="home">
                         <i class="fa-solid fa-house mr-1.5"></i> Home
                     </button>
-                    <button onclick="switchTab('math')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-emerald-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" data-tab="math">
+                    <button onclick="switchTab('math')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-600 hover:text-emerald-600 dark:text-gray-300" data-tab="math">
                         <i class="fa-solid fa-calculator mr-1.5"></i> Mathematics
                     </button>
-                    <button onclick="switchTab('computer')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-emerald-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" data-tab="computer">
+                    <button onclick="switchTab('computer')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-600 hover:text-emerald-600 dark:text-gray-300" data-tab="computer">
                         <i class="fa-solid fa-laptop-code mr-1.5"></i> Computer Studies
                     </button>
-                    <button onclick="switchTab('techhub')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-emerald-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" data-tab="techhub">
-                        <i class="fa-solid fa-microchip mr-1.5"></i> Tech Hub
+                    <button onclick="switchTab('techhub')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-600 hover:text-emerald-600 dark:text-gray-300" data-tab="techhub">
+                        <i class="fa-solid fa-microchip mr-1.5"></i> Tech & Innovations
                     </button>
-                    <button onclick="switchTab('quizzes')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-emerald-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" data-tab="quizzes">
+                    <button onclick="switchTab('quizzes')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-600 hover:text-emerald-600 dark:text-gray-300" data-tab="quizzes">
                         <i class="fa-solid fa-gamepad mr-1.5"></i> Quizzes & Games
                     </button>
-                    <button onclick="switchTab('portal')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-emerald-50 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300" data-tab="portal">
+                    <button onclick="switchTab('portal')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-600 hover:text-emerald-600 dark:text-gray-300" data-tab="portal">
                         <i class="fa-solid fa-user-graduate mr-1.5"></i> Student Portal
                     </button>
-                    <button onclick="switchTab('admin')" class="nav-btn px-3 py-2 rounded-lg text-sm font-medium transition hover:bg-emerald-50 dark:hover:bg-gray-800 text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-gray-800 border border-emerald-200 dark:border-emerald-900" data-tab="admin">
-                        <i class="fa-solid fa-shield-halved mr-1.5"></i> Admin Dashboard
+                    <button onclick="switchTab('admin')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-emerald-700 bg-emerald-100 hover:bg-emerald-200 border border-emerald-300" data-tab="admin">
+                        <i class="fa-solid fa-shield-halved mr-1.5"></i> Admin Panel
                     </button>
                 </nav>
 
                 <!-- Mobile Menu Button -->
                 <div class="flex items-center space-x-2 lg:hidden">
                     <button onclick="toggleMobileMenu()" class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 focus:outline-none">
-                        <i class="fa-solid fa-bars text-lg"></i>
+                        <i class="fa-solid fa-bars text-xl"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Mobile Navigation Menu -->
+        <!-- Mobile Navigation Drawer -->
         <div id="mobile-menu" class="hidden lg:hidden px-4 pt-2 pb-4 space-y-1 glass border-b border-gray-200 dark:border-gray-700">
-            <button onclick="switchTab('home'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-house mr-2"></i> Home</button>
-            <button onclick="switchTab('math'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-calculator mr-2"></i> Mathematics</button>
-            <button onclick="switchTab('computer'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-laptop-code mr-2"></i> Computer Studies</button>
-            <button onclick="switchTab('techhub'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-microchip mr-2"></i> Tech Hub</button>
-            <button onclick="switchTab('quizzes'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-gamepad mr-2"></i> Quizzes & Games</button>
-            <button onclick="switchTab('portal'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-user-graduate mr-2"></i> Student Portal</button>
-            <button onclick="switchTab('admin'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-gray-800"><i class="fa-solid fa-shield-halved mr-2"></i> Admin Dashboard</button>
+            <button onclick="switchTab('home'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-house mr-2 text-emerald-600"></i> Home</button>
+            <button onclick="switchTab('math'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-calculator mr-2 text-emerald-600"></i> Mathematics</button>
+            <button onclick="switchTab('computer'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-laptop-code mr-2 text-blue-600"></i> Computer Studies</button>
+            <button onclick="switchTab('techhub'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-microchip mr-2 text-indigo-600"></i> Tech & Innovations</button>
+            <button onclick="switchTab('quizzes'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-gamepad mr-2 text-amber-600"></i> Quizzes & Games</button>
+            <button onclick="switchTab('portal'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-user-graduate mr-2 text-teal-600"></i> Student Portal</button>
+            <button onclick="switchTab('admin'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-emerald-700 bg-emerald-50 dark:bg-gray-800"><i class="fa-solid fa-shield-halved mr-2"></i> Admin Panel</button>
         </div>
     </header>
 
-    <!-- Main Container -->
+    <!-- Main Content Wrapper -->
     <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
 
-        <!-- 1. HOME TAB -->
-        <section id="tab-home" class="tab-content active space-y-8 animate-fadeIn">
+        <!-- ==================== 1. HOME TAB ==================== -->
+        <section id="tab-home" class="tab-section space-y-8">
             <!-- Hero Banner -->
-            <div class="relative rounded-3xl overflow-hidden shadow-xl bg-gradient-to-r from-emerald-700 via-emerald-600 to-teal-700 text-white p-8 sm:p-12">
+            <div class="relative rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-r from-emerald-800 via-emerald-600 to-teal-700 text-white p-8 sm:p-12">
                 <div class="relative z-10 max-w-2xl space-y-4">
-                    <span class="inline-block px-3 py-1 rounded-full bg-emerald-500/30 border border-emerald-400 text-xs font-semibold tracking-wide uppercase">Excellence in STEM Education</span>
-                    <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">Welcome to Maalim-Kenya Education Hub</h2>
-                    <p class="text-emerald-100 text-base sm:text-lg">Your premier digital classroom for mastering Mathematics and Computer Studies. Curated with dedication by Instructor Daniel Chiro Bandari.</p>
+                    <span class="inline-block px-3.5 py-1 rounded-full bg-emerald-500/30 border border-emerald-400 text-xs font-bold tracking-wide uppercase">Excellence in STEM Education</span>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight leading-tight">MAALIM-KENYA EDUCATION HUB</h2>
+                    <p class="text-emerald-100 text-base sm:text-lg">Empowering Kenya's next generation with interactive Mathematics, Computer Studies, and Emerging Technology mastery.</p>
                     <div class="pt-4 flex flex-wrap gap-4">
-                        <button onclick="switchTab('math')" class="px-6 py-3 rounded-xl bg-white text-emerald-800 font-semibold shadow-lg hover:bg-emerald-50 transition transform hover:-translate-y-0.5">Explore Math</button>
-                        <button onclick="switchTab('computer')" class="px-6 py-3 rounded-xl bg-emerald-800/80 text-white border border-emerald-400/50 font-semibold shadow-lg hover:bg-emerald-800 transition transform hover:-translate-y-0.5">Computer Studies</button>
+                        <button onclick="switchTab('math')" class="px-6 py-3 rounded-xl bg-white text-emerald-800 font-bold shadow-lg hover:bg-emerald-50 transition transform hover:-translate-y-0.5">Explore Math Hub</button>
+                        <button onclick="switchTab('computer')" class="px-6 py-3 rounded-xl bg-emerald-900/80 text-white border border-emerald-400/50 font-bold shadow-lg hover:bg-emerald-900 transition transform hover:-translate-y-0.5">Computer Studies</button>
                     </div>
                 </div>
-                <div class="absolute right-0 bottom-0 opacity-10 transform translate-x-10 translate-y-10 pointer-events-none">
+                <div class="absolute right-0 bottom-0 opacity-15 transform translate-x-10 translate-y-10 pointer-events-none">
                     <i class="fa-solid fa-graduation-cap text-9xl"></i>
                 </div>
             </div>
 
-            <!-- Admin Profile & Contact Card -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass p-6 rounded-2xl shadow-sm flex items-center space-x-4">
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Daniel Chiro Bandari" class="w-16 h-16 rounded-full object-cover border-2 border-emerald-500 shadow">
-                    <div>
-                        <h3 class="font-bold text-lg text-gray-900 dark:text-white">Daniel Chiro Bandari</h3>
-                        <p class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Lead Instructor & Admin</p>
-                        <p class="text-xs text-gray-500 mt-1"><i class="fa-solid fa-envelope mr-1"></i> daniebandari@gmail.com</p>
-                        <p class="text-xs text-gray-500 mt-0.5"><i class="fa-solid fa-phone mr-1"></i> +254113696442</p>
+            <!-- Profile & Quick Stats Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <!-- Instructor Card -->
+                <div class="glass p-6 rounded-2xl shadow-sm space-y-4 border-l-4 border-emerald-500">
+                    <div class="flex items-center space-x-4">
+                        <img id="card-admin-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" alt="Daniel Chiro Bandari" class="w-16 h-16 rounded-full object-cover border-2 border-emerald-500 shadow-md">
+                        <div>
+                            <h3 id="display-admin-name" class="font-bold text-lg text-gray-900 dark:text-white">Daniel Chiro Bandari</h3>
+                            <p class="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Lead Instructor & Founder</p>
+                            <span class="inline-block mt-1 px-2 py-0.5 bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 text-[10px] font-extrabold rounded">MAALIM-KENYA</span>
+                        </div>
+                    </div>
+                    <p id="display-admin-bio" class="text-xs text-gray-600 dark:text-gray-300">Dedicated to transforming mathematical and computational learning across Kenyan secondary schools.</p>
+                    <div class="pt-2 border-t border-gray-200 dark:border-gray-700 text-xs space-y-1.5">
+                        <p class="flex items-center text-gray-600 dark:text-gray-300"><i class="fa-solid fa-envelope text-emerald-600 mr-2"></i> <span id="display-admin-email">daniebandari@gmail.com</span></p>
+                        <p class="flex items-center text-gray-600 dark:text-gray-300"><i class="fa-brands fa-whatsapp text-emerald-600 mr-2 text-sm"></i> <a href="https://wa.me/254113696442" target="_blank" class="text-emerald-600 underline font-semibold"><span id="display-admin-phone">+254113696442</span></a></p>
                     </div>
                 </div>
-                <div class="glass p-6 rounded-2xl shadow-sm flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-book-open text-emerald-600 mr-2"></i> Study Resources</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Access notes, past papers, programming guides, and video tutorials uploaded by the admin.</p>
+
+                <!-- Stats Counters -->
+                <div class="lg:col-span-2 grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="glass p-5 rounded-2xl shadow-sm text-center flex flex-col justify-center items-center">
+                        <i class="fa-solid fa-book-open text-2xl text-emerald-600 mb-2"></i>
+                        <h4 id="stat-resources-count" class="text-2xl font-black text-gray-900 dark:text-white">4</h4>
+                        <p class="text-xs font-semibold text-gray-500">Study Notes</p>
                     </div>
-                    <button onclick="switchTab('portal')" class="mt-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center">Browse Portal <i class="fa-solid fa-arrow-right ml-1"></i></button>
-                </div>
-                <div class="glass p-6 rounded-2xl shadow-sm flex flex-col justify-between">
-                    <div>
-                        <h3 class="font-bold text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-gamepad text-emerald-600 mr-2"></i> Interactive Learning</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Test your skills with quizzes and challenge yourself with our math sprint & binary converter games.</p>
+                    <div class="glass p-5 rounded-2xl shadow-sm text-center flex flex-col justify-center items-center">
+                        <i class="fa-solid fa-gamepad text-2xl text-amber-500 mb-2"></i>
+                        <h4 class="text-2xl font-black text-gray-900 dark:text-white">3</h4>
+                        <p class="text-xs font-semibold text-gray-500">Quiz Games</p>
                     </div>
-                    <button onclick="switchTab('quizzes')" class="mt-4 text-sm font-semibold text-emerald-600 dark:text-emerald-400 hover:underline flex items-center">Play & Quiz <i class="fa-solid fa-arrow-right ml-1"></i></button>
+                    <div class="glass p-5 rounded-2xl shadow-sm text-center flex flex-col justify-center items-center">
+                        <i class="fa-solid fa-calculator text-2xl text-blue-600 mb-2"></i>
+                        <h4 class="text-2xl font-black text-gray-900 dark:text-white">5+</h4>
+                        <p class="text-xs font-semibold text-gray-500">Math Tools</p>
+                    </div>
+                    <div class="glass p-5 rounded-2xl shadow-sm text-center flex flex-col justify-center items-center">
+                        <i class="fa-solid fa-network-wired text-2xl text-purple-600 mb-2"></i>
+                        <h4 class="text-2xl font-black text-gray-900 dark:text-white">100%</h4>
+                        <p class="text-xs font-semibold text-gray-500">Interactive</p>
+                    </div>
+
+                    <!-- Quick Navigation Cards -->
+                    <div class="col-span-2 sm:col-span-4 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                        <div onclick="switchTab('math')" class="glass p-4 rounded-xl cursor-pointer hover:border-emerald-500 transition shadow-sm flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center font-bold"><i class="fa-solid fa-square-root-variable"></i></div>
+                            <div><h4 class="font-bold text-sm">Math Reference</h4><p class="text-[11px] text-gray-500">Formulas & Calculators</p></div>
+                        </div>
+                        <div onclick="switchTab('computer')" class="glass p-4 rounded-xl cursor-pointer hover:border-blue-500 transition shadow-sm flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center font-bold"><i class="fa-solid fa-microchip"></i></div>
+                            <div><h4 class="font-bold text-sm">CPU Simulator</h4><p class="text-[11px] text-gray-500">Von Neumann Architecture</p></div>
+                        </div>
+                        <div onclick="switchTab('quizzes')" class="glass p-4 rounded-xl cursor-pointer hover:border-amber-500 transition shadow-sm flex items-center space-x-3">
+                            <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold"><i class="fa-solid fa-trophy"></i></div>
+                            <div><h4 class="font-bold text-sm">Speed Quiz</h4><p class="text-[11px] text-gray-500">Test Knowledge & Win</p></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Announcements & Recent Admin Feed -->
+            <!-- Recent Announcements -->
             <div class="space-y-4">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-bullhorn text-emerald-600 mr-2"></i> Recent Announcements & Posts</h3>
+                <h3 class="text-xl font-extrabold text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-bullhorn text-emerald-600 mr-2.5"></i> Notice Board & Updates</h3>
                 <div id="home-announcements-list" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Populated dynamically -->
-                    <div class="glass p-5 rounded-2xl border-l-4 border-emerald-500">
-                        <span class="text-xs font-bold text-emerald-600 uppercase">General Notice</span>
-                        <h4 class="font-bold text-lg mt-1">New Computer Studies Revision Notes Released</h4>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Check the Student Portal to download comprehensive notes on networking and Python programming.</p>
-                        <span class="text-xs text-gray-400 mt-4 block">Posted by Daniel Chiro Bandari</span>
-                    </div>
+                    <!-- Populated Dynamically -->
                 </div>
             </div>
         </section>
 
-        <!-- 2. MATHEMATICS TAB -->
-        <section id="tab-math" class="tab-content space-y-6">
-            <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-emerald-500">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <!-- ==================== 2. MATHEMATICS TAB ==================== -->
+        <section id="tab-math" class="tab-section hidden space-y-6">
+            <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-emerald-500 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full">Mathematics Department</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Mathematical Formulae & Tools</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Interactive formula sheets, geometric tools, and practice modules.</p>
+                </div>
+            </div>
+
+            <!-- Formula Sheet Accordion / Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Algebra -->
+                <div class="glass p-6 rounded-2xl shadow-sm space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-square-root-variable"></i></div>
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Algebra & Quadratic Formula</h3>
+                    <p class="text-xs text-gray-500">Standard form: $ax^2 + bx + c = 0$</p>
+                    <div class="bg-emerald-50 dark:bg-gray-800 p-3 rounded-xl font-mono text-xs text-emerald-800 dark:text-emerald-300">
+                        x = [-b ± √(b² - 4ac)] / 2a
+                    </div>
+                </div>
+                <!-- Trigonometry -->
+                <div class="glass p-6 rounded-2xl shadow-sm space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-shapes"></i></div>
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Trigonometric Ratios</h3>
+                    <p class="text-xs text-gray-500">SOH CAH TOA Definitions</p>
+                    <div class="bg-blue-50 dark:bg-gray-800 p-3 rounded-xl font-mono text-xs text-blue-800 dark:text-blue-300 space-y-1">
+                        <p>sin(θ) = Opp / Hyp</p>
+                        <p>cos(θ) = Adj / Hyp</p>
+                        <p>tan(θ) = Opp / Adj</p>
+                    </div>
+                </div>
+                <!-- Geometry -->
+                <div class="glass p-6 rounded-2xl shadow-sm space-y-3">
+                    <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-ruler-combined"></i></div>
+                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Coordinate Geometry</h3>
+                    <p class="text-xs text-gray-500">Distance & Midpoint</p>
+                    <div class="bg-purple-50 dark:bg-gray-800 p-3 rounded-xl font-mono text-xs text-purple-800 dark:text-purple-300 space-y-1">
+                        <p>d = √[(x₂ - x₁)² + (y₂ - y₁)²]</p>
+                        <p>M = ((x₁+x₂)/2, (y₁+y₂)/2)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Scale Factor & Geometry Tool -->
+            <div class="glass p-6 rounded-3xl shadow-sm space-y-4">
+                <h3 class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-draw-polygon text-emerald-600 mr-2"></i> Scale Factor & Area Ratio Calculator</h3>
+                <p class="text-xs text-gray-500">Calculate linear scale factor ($k$), area scale factor ($k^2$), and volume scale factor ($k^3$).</p>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-full">Subject Hub</span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Mathematics Department</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Master algebra, calculus, geometry, and statistics with expert notes and step-by-step guidance.</p>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Original Length ($L_1$)</label>
+                        <input type="number" id="scale-l1" value="5" oninput="calculateScaleFactor()" class="w-full mt-1 p-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
                     </div>
-                    <button onclick="filterPortalCategory('Mathematics')" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-semibold shadow transition">View All Math Notes</button>
-                </div>
-            </div>
-
-            <!-- Topic Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="glass p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center text-xl font-bold mb-4">
-                        <i class="fa-solid fa-square-root-variable"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Algebra & Quadratic Equations</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Comprehensive practice problems, factorisation techniques, and quadratic formula breakdowns.</p>
-                    <button onclick="openResourceModal('Algebra Notes', 'Mathematics')" class="mt-4 text-xs font-semibold text-emerald-600 hover:underline">Access Study Material &rarr;</button>
-                </div>
-                <div class="glass p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 flex items-center justify-center text-xl font-bold mb-4">
-                        <i class="fa-solid fa-chart-line"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Calculus & Differentiation</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Limits, derivatives, tangents, normals, and application to real-world rate of change problems.</p>
-                    <button onclick="openResourceModal('Calculus Notes', 'Mathematics')" class="mt-4 text-xs font-semibold text-emerald-600 hover:underline">Access Study Material &rarr;</button>
-                </div>
-                <div class="glass p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/50 text-purple-600 flex items-center justify-center text-xl font-bold mb-4">
-                        <i class="fa-solid fa-shapes"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Trigonometry & Geometry</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Sine & cosine rules, 3D geometry, circles, and trigonometric identities.</p>
-                    <button onclick="openResourceModal('Trigonometry Notes', 'Mathematics')" class="mt-4 text-xs font-semibold text-emerald-600 hover:underline">Access Study Material &rarr;</button>
-                </div>
-            </div>
-        </section>
-
-        <!-- 3. COMPUTER STUDIES TAB -->
-        <section id="tab-computer" class="tab-content space-y-6">
-            <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-blue-500">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full">Subject Hub</span>
-                        <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Computer Studies Department</h2>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Dive into hardware systems, software engineering, databases, networking, and programming fundamentals.</p>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Enlarged Length ($L_2$)</label>
+                        <input type="number" id="scale-l2" value="15" oninput="calculateScaleFactor()" class="w-full mt-1 p-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
                     </div>
-                    <button onclick="filterPortalCategory('Computer Studies')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-semibold shadow transition">View All CS Notes</button>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Original Area ($A_1$)</label>
+                        <input type="number" id="scale-a1" value="20" oninput="calculateScaleFactor()" class="w-full mt-1 p-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
+                    </div>
                 </div>
-            </div>
-
-            <!-- CS Topic Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="glass p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/50 text-blue-600 flex items-center justify-center text-xl font-bold mb-4">
-                        <i class="fa-solid fa-code"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Python Programming</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Variables, loops, functions, data structures, and algorithmic problem solving.</p>
-                    <button onclick="openResourceModal('Python Notes', 'Computer Studies')" class="mt-4 text-xs font-semibold text-blue-600 hover:underline">Access Study Material &rarr;</button>
-                </div>
-                <div class="glass p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center text-xl font-bold mb-4">
-                        <i class="fa-solid fa-network-wired"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Networking & Security</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">OSI model, TCP/IP, LAN/WAN topologies, cybersecurity basics, and data encryption.</p>
-                    <button onclick="openResourceModal('Networking Notes', 'Computer Studies')" class="mt-4 text-xs font-semibold text-emerald-600 hover:underline">Access Study Material &rarr;</button>
-                </div>
-                <div class="glass p-6 rounded-2xl shadow-sm hover:shadow-md transition">
-                    <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-900/50 text-amber-600 flex items-center justify-center text-xl font-bold mb-4">
-                        <i class="fa-solid fa-database"></i>
-                    </div>
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white">Database Management (DBMS)</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Relational databases, SQL queries, table normalisation, and data integrity.</p>
-                    <button onclick="openResourceModal('DBMS Notes', 'Computer Studies')" class="mt-4 text-xs font-semibold text-amber-600 hover:underline">Access Study Material &rarr;</button>
+                <div id="scale-result" class="p-4 bg-emerald-50 dark:bg-gray-800 rounded-2xl text-sm font-semibold text-emerald-800 dark:text-emerald-300">
+                    Linear Scale Factor (k) = 3.00 | Area Scale Factor (k²) = 9.00 | Scaled Area (A₂) = 180.00
                 </div>
             </div>
         </section>
 
-        <!-- 4. TECH HUB TAB -->
-        <section id="tab-techhub" class="tab-content space-y-6">
+        <!-- ==================== 3. COMPUTER STUDIES TAB ==================== -->
+        <section id="tab-computer" class="tab-section hidden space-y-6">
+            <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-blue-500 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div>
+                    <span class="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 text-xs font-bold rounded-full">Computer Studies Department</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Computer Architecture & Systems</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Interactive CPU simulator, number system converter, and network topology explorer.</p>
+                </div>
+            </div>
+
+            <!-- CPU Architecture Simulator -->
+            <div class="glass p-6 rounded-3xl shadow-sm space-y-4">
+                <h3 class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-microchip text-blue-600 mr-2"></i> Von Neumann Architecture Simulator</h3>
+                <p class="text-xs text-gray-500">Click components to view their functions in the fetch-decode-execute cycle.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <button onclick="inspectCpu('alu')" class="p-4 rounded-2xl border-2 border-blue-200 dark:border-blue-900 hover:border-blue-500 text-left transition bg-blue-50/50 dark:bg-gray-800">
+                        <h4 class="font-bold text-blue-700 dark:text-blue-400"><i class="fa-solid fa-calculator mr-2"></i> ALU</h4>
+                        <p class="text-xs text-gray-500 mt-1">Arithmetic Logic Unit</p>
+                    </button>
+                    <button onclick="inspectCpu('cu')" class="p-4 rounded-2xl border-2 border-emerald-200 dark:border-emerald-900 hover:border-emerald-500 text-left transition bg-emerald-50/50 dark:bg-gray-800">
+                        <h4 class="font-bold text-emerald-700 dark:text-emerald-400"><i class="fa-solid fa-gamepad mr-2"></i> Control Unit</h4>
+                        <p class="text-xs text-gray-500 mt-1">Directs CPU Operations</p>
+                    </button>
+                    <button onclick="inspectCpu('ram')" class="p-4 rounded-2xl border-2 border-purple-200 dark:border-purple-900 hover:border-purple-500 text-left transition bg-purple-50/50 dark:bg-gray-800">
+                        <h4 class="font-bold text-purple-700 dark:text-purple-400"><i class="fa-solid fa-memory mr-2"></i> RAM Registers</h4>
+                        <p class="text-xs text-gray-500 mt-1">Primary Memory / Cache</p>
+                    </button>
+                </div>
+                <div id="cpu-info-box" class="p-4 rounded-xl bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-200">
+                    Click a CPU component above to simulate cycle operations.
+                </div>
+            </div>
+
+            <!-- Number System Converter -->
+            <div class="glass p-6 rounded-3xl shadow-sm space-y-4">
+                <h3 class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-binary text-indigo-600 mr-2"></i> Binary, Decimal & Hexadecimal Converter</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Decimal (Base 10)</label>
+                        <input type="number" id="num-dec" oninput="convertNumberSystem('dec')" placeholder="e.g. 255" class="w-full mt-1 p-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Binary (Base 2)</label>
+                        <input type="text" id="num-bin" oninput="convertNumberSystem('bin')" placeholder="e.g. 11111111" class="w-full mt-1 p-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm font-mono">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Hexadecimal (Base 16)</label>
+                        <input type="text" id="num-hex" oninput="convertNumberSystem('hex')" placeholder="e.g. FF" class="w-full mt-1 p-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm font-mono uppercase">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== 4. TECH & INNOVATIONS TAB ==================== -->
+        <section id="tab-techhub" class="tab-section hidden space-y-6">
             <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-indigo-500">
-                <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 text-xs font-bold rounded-full">Innovation</span>
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Tech Hub & Digital Tools</h2>
-                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Interactive calculators, binary converters, and web developer utilities built for students.</p>
+                <span class="px-3 py-1 bg-indigo-100 dark:bg-indigo-900 text-indigo-700 text-xs font-bold rounded-full">Emerging Tech</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Tech & Innovations Hub</h2>
+                <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Explore LEO Satellites, Mobile App Development, and Interactive Tech Terminology Flashcards.</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Binary & Decimal Converter Tool -->
-                <div class="glass p-6 rounded-2xl shadow-sm space-y-4">
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-binary text-indigo-600 mr-2"></i> Binary & Decimal Converter</h3>
-                    <p class="text-xs text-gray-500">Easily convert numbers between Decimal and Binary format instantly.</p>
-                    <div class="space-y-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">Decimal Number</label>
-                            <input type="number" id="conv-decimal" oninput="convertDecimalToBinary()" placeholder="e.g. 42" class="w-full mt-1 px-4 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-600 dark:text-gray-400">Binary Equivalent</label>
-                            <input type="text" id="conv-binary" readonly class="w-full mt-1 px-4 py-2 rounded-xl bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 text-indigo-600 font-mono font-bold">
+            <!-- Flashcards Section -->
+            <div class="space-y-4">
+                <h3 class="text-xl font-extrabold text-gray-900 dark:text-white">Interactive Tech Terminology Flashcards (Click to Flip)</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <!-- Card 1 -->
+                    <div class="flip-card h-48 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass p-6 flex flex-col justify-center items-center text-center shadow-sm">
+                                <i class="fa-solid fa-satellite text-3xl text-indigo-600 mb-2"></i>
+                                <h4 class="font-bold text-gray-800 dark:text-white">LEO Satellites</h4>
+                                <p class="text-[10px] text-gray-400 mt-2">Click to reveal definition</p>
+                            </div>
+                            <div class="flip-card-back bg-indigo-600 text-white p-6 flex flex-col justify-center items-center text-center shadow-sm">
+                                <p class="text-xs font-medium">Low Earth Orbit satellites operating 160km to 2,000km above Earth, enabling high-speed internet like Starlink.</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- Quadratic Equation Solver -->
-                <div class="glass p-6 rounded-2xl shadow-sm space-y-4">
-                    <h3 class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-square-root-variable text-emerald-600 mr-2"></i> Quadratic Solver ($ax^2 + bx + c = 0$)</h3>
-                    <p class="text-xs text-gray-500">Enter coefficients a, b, and c to find the roots instantly.</p>
-                    <div class="grid grid-cols-3 gap-2">
-                        <input type="number" id="quad-a" placeholder="a" value="1" class="px-3 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-center">
-                        <input type="number" id="quad-b" placeholder="b" value="-5" class="px-3 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-center">
-                        <input type="number" id="quad-c" placeholder="c" value="6" class="px-3 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-center">
+                    <!-- Card 2 -->
+                    <div class="flip-card h-48 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass p-6 flex flex-col justify-center items-center text-center shadow-sm">
+                                <i class="fa-solid fa-robot text-3xl text-emerald-600 mb-2"></i>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Machine Learning</h4>
+                                <p class="text-[10px] text-gray-400 mt-2">Click to reveal definition</p>
+                            </div>
+                            <div class="flip-card-back bg-emerald-600 text-white p-6 flex flex-col justify-center items-center text-center shadow-sm">
+                                <p class="text-xs font-medium">A subset of AI where systems learn pattern data without being explicitly programmed.</p>
+                            </div>
+                        </div>
                     </div>
-                    <button onclick="solveQuadratic()" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm transition">Calculate Roots</button>
-                    <div id="quad-result" class="p-3 bg-emerald-50 dark:bg-gray-800 rounded-xl text-sm font-mono text-emerald-700 dark:text-emerald-300 text-center hidden"></div>
+                    <!-- Card 3 -->
+                    <div class="flip-card h-48 cursor-pointer" onclick="this.classList.toggle('flipped')">
+                        <div class="flip-card-inner">
+                            <div class="flip-card-front glass p-6 flex flex-col justify-center items-center text-center shadow-sm">
+                                <i class="fa-solid fa-mobile-screen-button text-3xl text-amber-500 mb-2"></i>
+                                <h4 class="font-bold text-gray-800 dark:text-white">Kodular</h4>
+                                <p class="text-[10px] text-gray-400 mt-2">Click to reveal definition</p>
+                            </div>
+                            <div class="flip-card-back bg-amber-600 text-white p-6 flex flex-col justify-center items-center text-center shadow-sm">
+                                <p class="text-xs font-medium">Block-based online Android application builder for creating native mobile apps visually.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- 5. QUIZZES & GAMES TAB -->
-        <section id="tab-quizzes" class="tab-content space-y-6">
+        <!-- ==================== 5. QUIZZES & GAMES TAB ==================== -->
+        <section id="tab-quizzes" class="tab-section hidden space-y-6">
             <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-amber-500 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
                     <span class="px-3 py-1 bg-amber-100 dark:bg-amber-900 text-amber-700 text-xs font-bold rounded-full">Interactive Zone</span>
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Quizzes & Mini-Games</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Challenge your knowledge with timed quizzes and educational mini-games.</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Test your skill with instant scoring and confetti celebrations!</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="switchQuizMode('math')" id="btn-quiz-math" class="px-4 py-2 rounded-xl font-semibold text-sm bg-emerald-600 text-white shadow">Math Quiz</button>
-                    <button onclick="switchQuizMode('computer')" id="btn-quiz-comp" class="px-4 py-2 rounded-xl font-semibold text-sm glass text-gray-700 dark:text-gray-200">CS Quiz</button>
-                    <button onclick="switchQuizMode('game')" id="btn-quiz-game" class="px-4 py-2 rounded-xl font-semibold text-sm glass text-gray-700 dark:text-gray-200">Math Sprint Game</button>
+                    <button onclick="startQuizMode('math')" id="btn-quiz-math" class="px-4 py-2 rounded-xl font-bold text-sm bg-emerald-600 text-white shadow">Math Quiz</button>
+                    <button onclick="startQuizMode('cs')" id="btn-quiz-cs" class="px-4 py-2 rounded-xl font-bold text-sm glass text-gray-700 dark:text-gray-200">CS Quiz</button>
                 </div>
             </div>
 
-            <!-- Quiz Container -->
+            <!-- Active Quiz Box -->
             <div id="quiz-area" class="glass p-6 sm:p-8 rounded-3xl shadow-sm space-y-6 max-w-2xl mx-auto">
-                <div class="flex justify-between items-center text-sm font-medium text-gray-500">
-                    <span id="quiz-progress">Question 1 of 5</span>
-                    <span id="quiz-score" class="text-emerald-600 font-bold">Score: 0</span>
+                <div class="flex justify-between items-center text-sm font-bold text-gray-500">
+                    <span id="quiz-progress-label">Question 1 of 5</span>
+                    <span id="quiz-score-label" class="text-emerald-600">Score: 0</span>
                 </div>
                 <div id="quiz-card" class="space-y-4">
-                    <h3 id="quiz-question" class="text-xl font-bold text-gray-900 dark:text-white">Loading question...</h3>
-                    <div id="quiz-options" class="grid grid-cols-1 gap-3">
+                    <h3 id="quiz-question-text" class="text-xl font-bold text-gray-900 dark:text-white">Loading Question...</h3>
+                    <div id="quiz-options-container" class="grid grid-cols-1 gap-3">
                         <!-- Options generated dynamically -->
                     </div>
                 </div>
-                <div id="quiz-feedback" class="hidden p-4 rounded-xl text-sm font-semibold"></div>
-                <button id="quiz-next-btn" onclick="nextQuizQuestion()" class="hidden w-full py-3 bg-emerald-600 text-white font-semibold rounded-xl hover:bg-emerald-700 transition">Next Question</button>
-            </div>
-
-            <!-- Math Sprint Mini-Game Container (Hidden by default) -->
-            <div id="game-area" class="hidden glass p-6 sm:p-8 rounded-3xl shadow-sm space-y-6 max-w-2xl mx-auto text-center">
-                <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Math Speed Sprint</h3>
-                <p class="text-sm text-gray-500">Solve as many simple arithmetic problems as you can in 30 seconds!</p>
-                <div id="game-start-screen" class="space-y-4">
-                    <button onclick="startMathGame()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-lg">Start Game</button>
-                </div>
-                <div id="game-play-screen" class="hidden space-y-4">
-                    <div class="flex justify-between text-lg font-bold">
-                        <span class="text-red-500">Time: <span id="game-timer">30</span>s</span>
-                        <span class="text-emerald-600">Score: <span id="game-score">0</span></span>
-                    </div>
-                    <div id="game-problem" class="text-3xl font-mono font-bold text-gray-800 dark:text-gray-100 py-6">5 + 3 = ?</div>
-                    <input type="number" id="game-answer" onkeydown="checkGameAnswer(event)" placeholder="Type answer & press Enter" class="w-full max-w-xs mx-auto px-4 py-3 rounded-xl glass border border-gray-300 dark:border-gray-700 text-center text-lg font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500 block">
-                </div>
-                <div id="game-over-screen" class="hidden space-y-4">
-                    <h4 class="text-xl font-bold text-gray-800 dark:text-white">Time's Up!</h4>
-                    <p class="text-lg">Your Final Score: <span id="final-game-score" class="font-bold text-emerald-600">0</span></p>
-                    <button onclick="startMathGame()" class="px-6 py-2 bg-emerald-600 text-white font-bold rounded-xl">Play Again</button>
-                </div>
+                <div id="quiz-feedback-box" class="hidden p-4 rounded-xl text-sm font-semibold"></div>
+                <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden w-full py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition">Next Question</button>
             </div>
         </section>
 
-        <!-- 6. STUDENT PORTAL TAB -->
-        <section id="tab-portal" class="tab-content space-y-6">
+        <!-- ==================== 6. STUDENT PORTAL TAB ==================== -->
+        <section id="tab-portal" class="tab-section hidden space-y-6">
             <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-teal-500 flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
                     <span class="px-3 py-1 bg-teal-100 dark:bg-teal-900 text-teal-700 text-xs font-bold rounded-full">Student Resources</span>
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Student Portal</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Download study notes, review past papers, or submit your homework notes/questions to instructor Daniel Chiro Bandari.</p>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Download materials or submit homework assignments directly to Instructor Daniel Chiro Bandari.</p>
                 </div>
-                <button onclick="openSubmissionModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm shadow transition flex items-center"><i class="fa-solid fa-upload mr-2"></i> Submit Assignment / Question</button>
+                <button onclick="openSubmissionModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm shadow transition flex items-center"><i class="fa-solid fa-upload mr-2"></i> Submit Assignment / Work</button>
             </div>
 
-            <!-- Search and Filter Bar -->
+            <!-- Filter Controls -->
             <div class="flex flex-col sm:flex-row gap-4">
-                <input type="text" id="resource-search" oninput="filterResources()" placeholder="Search notes, topics, or keywords..." class="flex-grow px-4 py-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                <select id="resource-category-filter" onchange="filterResources()" class="px-4 py-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    <option value="All">All Categories</option>
+                <input type="text" id="resource-search-input" oninput="renderResources()" placeholder="Search topics or keywords..." class="flex-grow px-4 py-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                <select id="resource-category-select" onchange="renderResources()" class="px-4 py-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm">
+                    <option value="All">All Subjects</option>
                     <option value="Mathematics">Mathematics</option>
                     <option value="Computer Studies">Computer Studies</option>
-                    <option value="General">General</option>
                 </select>
             </div>
 
-            <!-- Resources List Grid -->
+            <!-- Resource Cards Grid -->
             <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Populated dynamically from Firestore / Default data -->
-                <div class="glass p-6 rounded-2xl shadow-sm flex flex-col justify-between">
-                    <div>
-                        <div class="flex justify-between items-start">
-                            <span class="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded">Mathematics</span>
-                            <span class="text-xs text-gray-400">By Daniel Chiro Bandari</span>
-                        </div>
-                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mt-3">Form 4 Advanced Algebra Revision Guide</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Comprehensive summary notes covering polynomials, logarithms, and matrices.</p>
-                    </div>
-                    <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <span class="text-xs text-emerald-600 font-medium"><i class="fa-solid fa-file-pdf mr-1"></i> PDF Document</span>
-                        <button onclick="downloadResource('Form 4 Advanced Algebra Revision Guide')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow">Download</button>
-                    </div>
-                </div>
+                <!-- Populated dynamically -->
             </div>
 
-            <!-- Student Submissions View -->
+            <!-- Student Submissions Feed -->
             <div class="space-y-4 pt-6">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-clipboard-question text-teal-600 mr-2"></i> Recent Student Submissions & Questions</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-clipboard-question text-teal-600 mr-2"></i> Recent Student Submissions</h3>
                 <div id="submissions-list" class="space-y-3">
                     <!-- Populated dynamically -->
                 </div>
             </div>
         </section>
 
-        <!-- 7. ADMIN DASHBOARD TAB -->
-        <section id="tab-admin" class="tab-content space-y-6">
-            <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-emerald-600 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 text-xs font-bold rounded-full">Admin Panel</span>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Admin Dashboard</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Manage study materials, announcements, and student inquiries. Logged in as <strong class="text-emerald-600">Daniel Chiro Bandari</strong>.</p>
+        <!-- ==================== 7. ADMIN DASHBOARD TAB ==================== -->
+        <section id="tab-admin" class="tab-section hidden space-y-6">
+            
+            <!-- Passcode Protection Guard -->
+            <div id="admin-lock-screen" class="glass p-8 rounded-3xl shadow-lg max-w-md mx-auto text-center space-y-4">
+                <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl font-bold mx-auto">
+                    <i class="fa-solid fa-lock"></i>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="openAddResourceModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl text-sm shadow transition"><i class="fa-solid fa-plus mr-1"></i> Add Resource</button>
-                    <button onclick="openAddAnnouncementModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm shadow transition"><i class="fa-solid fa-bullhorn mr-1"></i> Post Announcement</button>
-                </div>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Admin Security Passcode</h3>
+                <p class="text-xs text-gray-500">Default passcode is <code class="bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono font-bold">admin124</code> or <code class="bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
+                <input type="password" id="admin-passcode-input" placeholder="Enter Admin Passcode" class="w-full px-4 py-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-center font-bold tracking-widest text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                <button onclick="unlockAdmin()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow transition">Unlock Dashboard</button>
             </div>
 
-            <!-- Admin Stats & Management Lists -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="glass p-6 rounded-2xl shadow-sm text-center">
-                    <h4 class="text-sm font-medium text-gray-500">Total Resources</h4>
-                    <p id="stat-resources" class="text-3xl font-extrabold text-emerald-600 mt-2">1</p>
+            <!-- Main Admin Panel (Hidden until unlocked) -->
+            <div id="admin-dashboard-content" class="hidden space-y-6">
+                <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-emerald-600 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div>
+                        <span class="px-3 py-1 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 text-xs font-bold rounded-full">Administrator</span>
+                        <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Admin Management Dashboard</h2>
+                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Logged in as <strong class="text-emerald-600">Daniel Chiro Bandari</strong>.</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openAddResourceModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-sm shadow transition"><i class="fa-solid fa-plus mr-1"></i> Add Resource</button>
+                        <button onclick="openAddAnnouncementModal()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm shadow transition"><i class="fa-solid fa-bullhorn mr-1"></i> Post Announcement</button>
+                    </div>
                 </div>
-                <div class="glass p-6 rounded-2xl shadow-sm text-center">
-                    <h4 class="text-sm font-medium text-gray-500">Active Announcements</h4>
-                    <p id="stat-announcements" class="text-3xl font-extrabold text-blue-600 mt-2">1</p>
-                </div>
-                <div class="glass p-6 rounded-2xl shadow-sm text-center">
-                    <h4 class="text-sm font-medium text-gray-500">Student Submissions</h4>
-                    <p id="stat-submissions" class="text-3xl font-extrabold text-teal-600 mt-2">0</p>
-                </div>
-            </div>
 
-            <!-- Admin Resource Management Table -->
-            <div class="glass p-6 rounded-3xl shadow-sm space-y-4">
-                <h3 class="text-lg font-bold text-gray-900 dark:text-white">Manage Uploaded Resources</h3>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
-                            <tr>
-                                <th class="p-3 rounded-l-xl">Title</th>
-                                <th class="p-3">Category</th>
-                                <th class="p-3">Author</th>
-                                <th class="p-3 rounded-r-xl text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-resources-table" class="divide-y divide-gray-200 dark:divide-gray-700">
-                            <!-- Populated dynamically -->
-                        </tbody>
-                    </table>
+                <!-- Admin Profile Management -->
+                <div class="glass p-6 rounded-3xl shadow-sm space-y-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-user-gear text-emerald-600 mr-2"></i> Update Instructor Profile</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Profile Name</label>
+                            <input type="text" id="edit-admin-name" value="Daniel Chiro Bandari" class="w-full mt-1 p-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Contact Email</label>
+                            <input type="email" id="edit-admin-email" value="daniebandari@gmail.com" class="w-full mt-1 p-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Phone / WhatsApp</label>
+                            <input type="text" id="edit-admin-phone" value="+254113696442" class="w-full mt-1 p-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Avatar Image URL</label>
+                            <input type="text" id="edit-admin-avatar" value="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80" class="w-full mt-1 p-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
+                        </div>
+                    </div>
+                    <button onclick="saveAdminProfile()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs shadow">Save Profile Changes</button>
+                </div>
+
+                <!-- Admin Resource CRUD Table -->
+                <div class="glass p-6 rounded-3xl shadow-sm space-y-4">
+                    <h3 class="text-lg font-bold text-gray-900 dark:text-white">Manage Uploaded Materials</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">
+                                <tr>
+                                    <th class="p-3 rounded-l-xl">Title</th>
+                                    <th class="p-3">Category</th>
+                                    <th class="p-3">Author</th>
+                                    <th class="p-3 rounded-r-xl text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-crud-table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </section>
@@ -462,15 +550,15 @@
     <!-- Footer -->
     <footer class="glass mt-12 border-t border-gray-200 dark:border-gray-800 py-8 text-center text-xs text-gray-500 dark:text-gray-400 space-y-2">
         <p>&copy; 2026 MAALIM-KENYA EDUCATION HUB. All rights reserved.</p>
-        <p>Lead Instructor & Administrator: <strong class="text-emerald-600 dark:text-emerald-400">Daniel Chiro Bandari</strong> | Contact: daniebandari@gmail.com | Tel: +254113696442</p>
+        <p>Lead Instructor & Administrator: <strong class="text-emerald-600 dark:text-emerald-400">Daniel Chiro Bandari</strong> | Email: daniebandari@gmail.com | WhatsApp: +254113696442</p>
     </footer>
 
-    <!-- Modals (Custom UI instead of alert/confirm) -->
+    <!-- Universal Custom Modal -->
     <div id="custom-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-        <div class="glass max-w-md w-full p-6 rounded-3xl shadow-2xl space-y-4 animate-scaleUp">
+        <div class="glass max-w-md w-full p-6 rounded-3xl shadow-2xl space-y-4">
             <h3 id="modal-title" class="text-xl font-bold text-gray-900 dark:text-white">Notice</h3>
-            <p id="modal-message" class="text-sm text-gray-600 dark:text-gray-300">Message content here...</p>
-            <div id="modal-body" class="space-y-3"></div>
+            <p id="modal-msg" class="text-sm text-gray-600 dark:text-gray-300">Message content...</p>
+            <div id="modal-custom-body" class="space-y-3"></div>
             <div class="flex justify-end space-x-2 pt-2">
                 <button id="modal-cancel-btn" onclick="closeModal()" class="hidden px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-xl text-sm font-semibold">Cancel</button>
                 <button id="modal-ok-btn" onclick="closeModal()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-sm font-semibold shadow">OK</button>
@@ -478,288 +566,131 @@
         </div>
     </div>
 
-    <!-- Firebase & Application Script -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, deleteDoc, onSnapshot, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <!-- Application Logic Script -->
+    <script>
+        // Global Data Store
+        let state = {
+            admin: {
+                name: "Daniel Chiro Bandari",
+                email: "daniebandari@gmail.com",
+                phone: "+254113696442",
+                bio: "Dedicated to transforming mathematical and computational learning across Kenyan secondary schools.",
+                avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80"
+            },
+            resources: [
+                { id: '1', title: 'Form 4 Advanced Algebra Revision Guide', category: 'Mathematics', author: 'Daniel Chiro Bandari', type: 'PDF' },
+                { id: '2', title: 'Python Programming Basics for KCSE', category: 'Computer Studies', author: 'Daniel Chiro Bandari', type: 'Notes' },
+                { id: '3', title: 'KCSE Trigonometry Past Questions & Answers', category: 'Mathematics', author: 'Daniel Chiro Bandari', type: 'PDF' },
+                { id: '4', title: 'Computer Networks & Topologies Notes', category: 'Computer Studies', author: 'Daniel Chiro Bandari', type: 'Doc' }
+            ],
+            announcements: [
+                { id: '1', title: 'Welcome to Maalim-Kenya Education Hub', content: 'Explore interactive math formulas, CPU simulators, and downloadable KCSE study guides.', author: 'Daniel Chiro Bandari' }
+            ],
+            submissions: []
+        };
 
-        // Global variables provided by environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'maalim-kenya-hub-default';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : { apiKey: "demo", projectId: "demo" };
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // Standardized Switch Tab function using explicit class addition/removal
+        function switchTab(tabId) {
+            console.log("Switching tab to:", tabId);
+            
+            // Hide all tab sections
+            const sections = document.querySelectorAll('.tab-section');
+            sections.forEach(sec => sec.classList.add('hidden'));
 
-        let app, db, auth, currentUser = null;
-
-        try {
-            app = initializeApp(firebaseConfig);
-            db = getFirestore(app);
-            auth = getAuth(app);
-
-            if (initialAuthToken) {
-                await signInWithCustomToken(auth, initialAuthToken);
-            } else {
-                await signInAnonymously(auth);
-            }
-
-            onAuthStateChanged(auth, (user) => {
-                currentUser = user;
-                if (user) {
-                    initFirestoreListeners();
-                }
-            });
-        } catch (e) {
-            console.warn("Firebase initialization warning (using local fallback mode):", e);
-            initLocalFallback();
-        }
-
-        // Local state
-        let resources = [
-            { id: '1', title: 'Form 4 Advanced Algebra Revision Guide', category: 'Mathematics', author: 'Daniel Chiro Bandari', type: 'PDF' },
-            { id: '2', title: 'Python Programming Basics for Beginners', category: 'Computer Studies', author: 'Daniel Chiro Bandari', type: 'Notes' }
-        ];
-        let announcements = [
-            { id: '1', title: 'New Computer Studies Revision Notes Released', content: 'Check the Student Portal to download comprehensive notes on networking and Python programming.', author: 'Daniel Chiro Bandari' }
-        ];
-        let submissions = [];
-
-        window.switchTab = function(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('text-emerald-600', 'dark:text-emerald-400', 'bg-emerald-50', 'dark:bg-gray-800');
+            // Remove active style from desktop nav buttons
+            const navBtns = document.querySelectorAll('.nav-btn');
+            navBtns.forEach(btn => {
+                btn.classList.remove('text-emerald-600', 'bg-emerald-50', 'dark:bg-gray-800');
                 btn.classList.add('text-gray-600', 'dark:text-gray-300');
             });
 
-            const targetTab = document.getElementById(`tab-${tabId}`);
-            if (targetTab) targetTab.classList.add('active');
-
-            const activeBtn = document.querySelector(`[data-tab="${tabId}"]`);
-            if (activeBtn) {
-                activeBtn.classList.remove('text-gray-600', 'dark:text-gray-300');
-                activeBtn.classList.add('text-emerald-600', 'dark:text-emerald-400', 'bg-emerald-50', 'dark:bg-gray-800');
+            // Target section
+            const targetSection = document.getElementById(`tab-${tabId}`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            } else {
+                console.error("Tab section not found:", `tab-${tabId}`);
             }
+
+            // Target button
+            const targetBtn = document.querySelector(`[data-tab="${tabId}"]`);
+            if (targetBtn) {
+                targetBtn.classList.remove('text-gray-600', 'dark:text-gray-300');
+                targetBtn.classList.add('text-emerald-600', 'bg-emerald-50', 'dark:bg-gray-800');
+            }
+
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        window.toggleMobileMenu = function() {
+        function toggleMobileMenu() {
             const menu = document.getElementById('mobile-menu');
             menu.classList.toggle('hidden');
         }
 
-        // Quiz Data
-        const mathQuiz = [
-            { q: "What is the derivative of $x^2$?", options: ["2x", "x", "x^2", "2"], answer: 0 },
-            { q: "Solve for x: $2x + 4 = 12$", options: ["x = 2", "x = 4", "x = 6", "x = 8"], answer: 1 },
-            { q: "What is the value of $\\pi$ (approx)?", options: ["3.14", "2.71", "1.41", "1.73"], answer: 0 },
-            { q: "What is the area of a circle with radius 7cm? ($\\pi = \\frac{22}{7}$)", options: ["154 cm²", "44 cm²", "88 cm²", "308 cm²"], answer: 0 },
-            { q: "What is $9^2$", options: ["81", "18", "72", "99"], answer: 0 }
-        ];
-
-        const computerQuiz = [
-            { q: "Which of the following is considered the brain of the computer?", options: ["RAM", "CPU", "Hard Disk", "GPU"], answer: 1 },
-            { q: "What does HTML stand for?", options: ["Hyper Text Markup Language", "High Tech Multi Language", "Hyperlinks and Text Markup Language", "Home Tool Markup Language"], answer: 0 },
-            { q: "Which of these is a Python data type?", options: ["String", "Integer", "Boolean", "All of the above"], answer: 3 },
-            { q: "What is the base of the binary number system?", options: ["10", "2", "8", "16"], answer: 1 },
-            { q: "Which protocol is used to secure web traffic?", options: ["HTTP", "FTP", "HTTPS", "SMTP"], answer: 2 }
-        ];
-
-        let currentQuizType = 'math';
-        let currentQuizIndex = 0;
-        let quizScore = 0;
-
-        window.switchQuizMode = function(type) {
-            currentQuizType = type;
-            currentQuizIndex = 0;
-            quizScore = 0;
-            document.getElementById('quiz-area').classList.remove('hidden');
-            document.getElementById('game-area').classList.add('hidden');
-
-            document.getElementById('btn-quiz-math').className = type === 'math' ? 'px-4 py-2 rounded-xl font-semibold text-sm bg-emerald-600 text-white shadow' : 'px-4 py-2 rounded-xl font-semibold text-sm glass text-gray-700 dark:text-gray-200';
-            document.getElementById('btn-quiz-comp').className = type === 'computer' ? 'px-4 py-2 rounded-xl font-semibold text-sm bg-emerald-600 text-white shadow' : 'px-4 py-2 rounded-xl font-semibold text-sm glass text-gray-700 dark:text-gray-200';
-            document.getElementById('btn-quiz-game').className = type === 'game' ? 'px-4 py-2 rounded-xl font-semibold text-sm bg-emerald-600 text-white shadow' : 'px-4 py-2 rounded-xl font-semibold text-sm glass text-gray-700 dark:text-gray-200';
-
-            if (type === 'game') {
-                document.getElementById('quiz-area').classList.add('hidden');
-                document.getElementById('game-area').classList.remove('hidden');
-                return;
-            }
-
-            loadQuizQuestion();
-        }
-
-        function loadQuizQuestion() {
-            const questions = currentQuizType === 'math' ? mathQuiz : computerQuiz;
-            if (currentQuizIndex >= questions.length) {
-                document.getElementById('quiz-card').innerHTML = `
-                    <div class="text-center py-6 space-y-4">
-                        <h3 class="text-2xl font-bold text-gray-900 dark:text-white">Quiz Completed! 🎉</h3>
-                        <p class="text-lg">Your Score: <span class="font-bold text-emerald-600">${quizScore} / ${questions.length}</span></p>
-                        <button onclick="switchQuizMode('${currentQuizType}')" class="px-6 py-2 bg-emerald-600 text-white font-semibold rounded-xl">Try Again</button>
-                    </div>
-                `;
-                document.getElementById('quiz-progress').innerText = "Complete";
-                document.getElementById('quiz-score').innerText = `Final Score: ${quizScore}`;
-                document.getElementById('quiz-feedback').classList.add('hidden');
-                document.getElementById('quiz-next-btn').classList.add('hidden');
-                return;
-            }
-
-            const qObj = questions[currentQuizIndex];
-            document.getElementById('quiz-progress').innerText = `Question ${currentQuizIndex + 1} of ${questions.length}`;
-            document.getElementById('quiz-score').innerText = `Score: ${quizScore}`;
-            document.getElementById('quiz-question').innerText = qObj.q;
-
-            const optionsDiv = document.getElementById('quiz-options');
-            optionsDiv.innerHTML = '';
-            qObj.options.forEach((opt, idx) => {
-                optionsDiv.innerHTML += `
-                    <button onclick="selectQuizOption(${idx})" class="w-full text-left p-3 rounded-xl glass border border-gray-200 dark:border-gray-700 hover:bg-emerald-50 dark:hover:bg-gray-800 transition font-medium text-sm quiz-opt-btn" data-idx="${idx}">
-                        ${opt}
-                    </button>
-                `;
-            });
-            document.getElementById('quiz-feedback').classList.add('hidden');
-            document.getElementById('quiz-next-btn').classList.add('hidden');
-        }
-
-        window.selectQuizOption = function(idx) {
-            const questions = currentQuizType === 'math' ? mathQuiz : computerQuiz;
-            const qObj = questions[currentQuizIndex];
-            const optBtns = document.querySelectorAll('.quiz-opt-btn');
-
-            optBtns.forEach((btn, i) => {
-                btn.disabled = true;
-                if (i === qObj.answer) {
-                    btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800', 'dark:bg-emerald-900/50');
-                } else if (i === idx) {
-                    btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800', 'dark:bg-red-900/50');
-                }
-            });
-
-            const feedback = document.getElementById('quiz-feedback');
-            feedback.classList.remove('hidden');
-            if (idx === qObj.answer) {
-                quizScore++;
-                feedback.className = 'p-4 rounded-xl text-sm font-semibold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300';
-                feedback.innerText = 'Correct! Great job.';
-            } else {
-                feedback.className = 'p-4 rounded-xl text-sm font-semibold bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300';
-                feedback.innerText = 'Incorrect. Review the correct option above.';
-            }
-            document.getElementById('quiz-score').innerText = `Score: ${quizScore}`;
-            document.getElementById('quiz-next-btn').classList.remove('hidden');
-        }
-
-        window.nextQuizQuestion = function() {
-            currentQuizIndex++;
-            loadQuizQuestion();
-        }
-
-        // Math Sprint Game Logic
-        let gameTimerInterval;
-        let timeLeft = 30;
-        let gameScore = 0;
-        let currentProblem = { num1: 0, num2: 0, op: '+', ans: 0 };
-
-        window.startMathGame = function() {
-            timeLeft = 30;
-            gameScore = 0;
-            document.getElementById('game-start-screen').classList.add('hidden');
-            document.getElementById('game-over-screen').classList.add('hidden');
-            document.getElementById('game-play-screen').classList.remove('hidden');
-            document.getElementById('game-timer').innerText = timeLeft;
-            document.getElementById('game-score').innerText = gameScore;
-            generateMathProblem();
-            document.getElementById('game-answer').focus();
-
-            clearInterval(gameTimerInterval);
-            gameTimerInterval = setInterval(() => {
-                timeLeft--;
-                document.getElementById('game-timer').innerText = timeLeft;
-                if (timeLeft <= 0) {
-                    clearInterval(gameTimerInterval);
-                    document.getElementById('game-play-screen').classList.add('hidden');
-                    document.getElementById('game-over-screen').classList.remove('hidden');
-                    document.getElementById('final-game-score').innerText = gameScore;
-                }
-            }, 1000);
-        }
-
-        function generateMathProblem() {
-            const num1 = Math.floor(Math.random() * 12) + 1;
-            const num2 = Math.floor(Math.random() * 12) + 1;
-            const ops = ['+', '-', '*'];
-            const op = ops[Math.floor(Math.random() * ops.length)];
-            let ans = 0;
-            if (op === '+') ans = num1 + num2;
-            if (op === '-') ans = num1 - num2;
-            if (op === '*') ans = num1 * num2;
-            currentProblem = { num1, num2, op, ans };
-            document.getElementById('game-problem').innerText = `${num1} ${op} ${num2} = ?`;
-            document.getElementById('game-answer').value = '';
-        }
-
-        window.checkGameAnswer = function(e) {
-            if (e.key === 'Enter') {
-                const userVal = parseInt(document.getElementById('game-answer').value);
-                if (userVal === currentProblem.ans) {
-                    gameScore += 10;
-                    document.getElementById('game-score').innerText = gameScore;
-                }
-                generateMathProblem();
-            }
-        }
-
-        // Converter Tools
-        window.convertDecimalToBinary = function() {
-            const val = parseInt(document.getElementById('conv-decimal').value);
-            if (isNaN(val)) {
-                document.getElementById('conv-binary').value = '';
-                return;
-            }
-            document.getElementById('conv-binary').value = val.toString(2);
-        }
-
-        window.solveQuadratic = function() {
-            const a = parseFloat(document.getElementById('quad-a').value);
-            const b = parseFloat(document.getElementById('quad-b').value);
-            const c = parseFloat(document.getElementById('quad-c').value);
-            const resDiv = document.getElementById('quad-result');
-            resDiv.classList.remove('hidden');
-
-            const disc = b * b - 4 * a * c;
-            if (disc < 0) {
-                resDiv.innerText = `No real roots (Discriminant < 0)`;
-            } else if (disc === 0) {
-                const x = -b / (2 * a);
-                resDiv.innerText = `One repeated root: x = ${x.toFixed(2)}`;
-            } else {
-                const x1 = (-b + Math.sqrt(disc)) / (2 * a);
-                const x2 = (-b - Math.sqrt(disc)) / (2 * a);
-                resDiv.innerText = `Roots: x₁ = ${x1.toFixed(2)}, x₂ = ${x2.toFixed(2)}`;
-            }
-        }
-
-        // Render UI
+        // Render functions for state updating
         function renderAll() {
-            // Home announcements
-            const homeList = document.getElementById('home-announcements-list');
-            homeList.innerHTML = announcements.map(a => `
-                <div class="glass p-5 rounded-2xl border-l-4 border-emerald-500 space-y-2">
-                    <span class="text-xs font-bold text-emerald-600 uppercase">Announcement</span>
-                    <h4 class="font-bold text-lg">${a.title}</h4>
-                    <p class="text-sm text-gray-600 dark:text-gray-300">${a.content}</p>
-                    <span class="text-xs text-gray-400 block">Posted by ${a.author}</span>
+            // Render Admin Profile Info
+            document.getElementById('header-admin-avatar').src = state.admin.avatar;
+            document.getElementById('card-admin-avatar').src = state.admin.avatar;
+            document.getElementById('display-admin-name').innerText = state.admin.name;
+            document.getElementById('display-admin-email').innerText = state.admin.email;
+            document.getElementById('display-admin-phone').innerText = state.admin.phone;
+            document.getElementById('display-admin-bio').innerText = state.admin.bio;
+
+            // Stats
+            document.getElementById('stat-resources-count').innerText = state.resources.length;
+
+            // Announcements
+            const annContainer = document.getElementById('home-announcements-list');
+            annContainer.innerHTML = state.announcements.map(a => `
+                <div class="glass p-5 rounded-2xl border-l-4 border-emerald-500 space-y-2 shadow-sm">
+                    <span class="text-[10px] font-bold text-emerald-600 uppercase bg-emerald-100 dark:bg-emerald-900/50 px-2 py-0.5 rounded">Announcement</span>
+                    <h4 class="font-bold text-base text-gray-900 dark:text-white">${a.title}</h4>
+                    <p class="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">${a.content}</p>
+                    <span class="text-[10px] text-gray-400 block pt-2 border-t border-gray-100 dark:border-gray-800">Posted by ${a.author}</span>
                 </div>
             `).join('');
 
-            // Portal resources
-            const searchVal = document.getElementById('resource-search')?.value.toLowerCase() || '';
-            const catVal = document.getElementById('resource-category-filter')?.value || 'All';
+            // Resources Portal
+            renderResources();
+
+            // Submissions List
+            const subContainer = document.getElementById('submissions-list');
+            if (state.submissions.length === 0) {
+                subContainer.innerHTML = `<p class="text-xs text-gray-400 italic">No submissions yet.</p>`;
+            } else {
+                subContainer.innerHTML = state.submissions.map(s => `
+                    <div class="glass p-4 rounded-xl flex justify-between items-center text-xs">
+                        <div>
+                            <h4 class="font-bold text-gray-900 dark:text-white">${s.name}</h4>
+                            <p class="text-gray-600 dark:text-gray-300 mt-0.5">${s.msg}</p>
+                        </div>
+                        <span class="text-[10px] px-2 py-1 bg-emerald-100 text-emerald-700 rounded font-bold">Received</span>
+                    </div>
+                `).join('');
+            }
+
+            // Admin CRUD Table
+            const crudBody = document.getElementById('admin-crud-table-body');
+            crudBody.innerHTML = state.resources.map(r => `
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
+                    <td class="p-3 font-semibold">${r.title}</td>
+                    <td class="p-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded text-xs font-bold">${r.category}</span></td>
+                    <td class="p-3 text-gray-500 text-xs">${r.author}</td>
+                    <td class="p-3 text-right space-x-1">
+                        <button onclick="deleteResource('${r.id}')" class="px-2.5 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-xs font-semibold"><i class="fa-solid fa-trash"></i> Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderResources() {
+            const searchVal = document.getElementById('resource-search-input')?.value.toLowerCase() || '';
+            const catVal = document.getElementById('resource-category-select')?.value || 'All';
             const grid = document.getElementById('resources-grid');
 
-            const filtered = resources.filter(r => {
-                const matchSearch = r.title.toLowerCase().includes(searchVal) || r.category.toLowerCase().includes(searchVal);
+            const filtered = state.resources.filter(r => {
+                const matchSearch = r.title.toLowerCase().includes(searchVal);
                 const matchCat = catVal === 'All' || r.category === catVal;
                 return matchSearch && matchCat;
             });
@@ -769,193 +700,238 @@
                     <div>
                         <div class="flex justify-between items-start">
                             <span class="px-2.5 py-0.5 bg-emerald-100 dark:bg-emerald-900 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded">${r.category}</span>
-                            <span class="text-xs text-gray-400">By ${r.author}</span>
+                            <span class="text-[10px] text-gray-400">By ${r.author}</span>
                         </div>
-                        <h3 class="font-bold text-lg text-gray-900 dark:text-white mt-3">${r.title}</h3>
-                        <p class="text-sm text-gray-600 dark:text-gray-300 mt-2">Verified curriculum resource for Maalim-Kenya students.</p>
+                        <h3 class="font-bold text-base text-gray-900 dark:text-white mt-3">${r.title}</h3>
+                        <p class="text-xs text-gray-500 mt-2">Verified curriculum study guide for KCSE preparation.</p>
                     </div>
                     <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700 flex justify-between items-center">
-                        <span class="text-xs text-emerald-600 font-medium"><i class="fa-solid fa-file-lines mr-1"></i> ${r.type}</span>
+                        <span class="text-xs text-emerald-600 font-bold"><i class="fa-solid fa-file-pdf mr-1"></i> ${r.type}</span>
                         <button onclick="downloadResource('${r.title}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold shadow">Download</button>
                     </div>
                 </div>
             `).join('');
+        }
 
-            // Submissions list
-            const subList = document.getElementById('submissions-list');
-            if (submissions.length === 0) {
-                subList.innerHTML = `<p class="text-sm text-gray-500 italic">No submissions or questions yet. Be the first to submit!</p>`;
-            } else {
-                subList.innerHTML = submissions.map(s => `
-                    <div class="glass p-4 rounded-xl flex justify-between items-center">
-                        <div>
-                            <h4 class="font-bold text-sm text-gray-800 dark:text-white">${s.studentName}</h4>
-                            <p class="text-xs text-gray-600 dark:text-gray-300 mt-1">${s.message}</p>
-                        </div>
-                        <span class="text-xs text-gray-400">Submitted</span>
+        // Quiz Logic with Confetti
+        const mathQuestions = [
+            { q: "What is the derivative of x²?", options: ["2x", "x", "x²", "2"], answer: 0 },
+            { q: "Solve for x: 2x + 4 = 12", options: ["x = 2", "x = 4", "x = 6", "x = 8"], answer: 1 },
+            { q: "What is the area of a circle with radius 7? (π = 22/7)", options: ["154", "44", "88", "308"], answer: 0 }
+        ];
+
+        const csQuestions = [
+            { q: "Which component executes calculations inside the CPU?", options: ["Control Unit", "ALU", "RAM", "ROM"], answer: 1 },
+            { q: "What is 255 in binary?", options: ["11111111", "10000000", "11110000", "10101010"], answer: 0 },
+            { q: "Which topology connects all nodes to a single central hub?", options: ["Bus", "Ring", "Star", "Mesh"], answer: 2 }
+        ];
+
+        let currentQuiz = mathQuestions;
+        let quizIdx = 0;
+        let quizScore = 0;
+
+        function startQuizMode(type) {
+            currentQuiz = type === 'math' ? mathQuestions : csQuestions;
+            quizIdx = 0;
+            quizScore = 0;
+            document.getElementById('btn-quiz-math').className = type === 'math' ? 'px-4 py-2 rounded-xl font-bold text-sm bg-emerald-600 text-white shadow' : 'px-4 py-2 rounded-xl font-bold text-sm glass text-gray-700 dark:text-gray-200';
+            document.getElementById('btn-quiz-cs').className = type === 'cs' ? 'px-4 py-2 rounded-xl font-bold text-sm bg-emerald-600 text-white shadow' : 'px-4 py-2 rounded-xl font-bold text-sm glass text-gray-700 dark:text-gray-200';
+            loadQuizQuestion();
+        }
+
+        function loadQuizQuestion() {
+            if (quizIdx >= currentQuiz.length) {
+                // Quiz Completed
+                document.getElementById('quiz-card').innerHTML = `
+                    <div class="text-center py-6 space-y-4">
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white">Quiz Completed! 🎉</h3>
+                        <p class="text-lg font-bold">Final Score: <span class="text-emerald-600">${quizScore} / ${currentQuiz.length}</span></p>
+                        <button onclick="startQuizMode('${currentQuiz === mathQuestions ? 'math' : 'cs'}')" class="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-xl shadow">Retake Quiz</button>
                     </div>
-                `).join('');
-            }
-
-            // Admin table & stats
-            document.getElementById('stat-resources').innerText = resources.length;
-            document.getElementById('stat-announcements').innerText = announcements.length;
-            document.getElementById('stat-submissions').innerText = submissions.length;
-
-            const adminTable = document.getElementById('admin-resources-table');
-            adminTable.innerHTML = resources.map(r => `
-                <tr class="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <td class="p-3 font-medium">${r.title}</td>
-                    <td class="p-3"><span class="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded text-xs font-semibold">${r.category}</span></td>
-                    <td class="p-3 text-gray-500">${r.author}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="deleteResource('${r.id}')" class="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-xs font-semibold"><i class="fa-solid fa-trash"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        }
-
-        window.filterResources = function() { renderAll(); }
-        window.filterPortalCategory = function(cat) {
-            switchTab('portal');
-            document.getElementById('resource-category-filter').value = cat;
-            renderAll();
-        }
-
-        window.downloadResource = function(title) {
-            showModal("Download Resource", `Preparing download for: "${title}". Your file download will begin shortly.`);
-        }
-
-        window.openResourceModal = function(title, cat) {
-            showModal(title, `Accessing study notes and revision questions for ${cat}. Click below to view full notes.`);
-        }
-
-        window.openSubmissionModal = function() {
-            showModal("Submit Assignment or Question", "", `
-                <div class="space-y-3">
-                    <input type="text" id="sub-name" placeholder="Your Full Name" class="w-full px-3 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
-                    <textarea id="sub-msg" placeholder="Type your homework notes or question for Daniel Chiro Bandari..." rows="3" class="w-full px-3 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm"></textarea>
-                    <button onclick="submitStudentWork()" class="w-full py-2 bg-emerald-600 text-white font-semibold rounded-xl text-sm">Submit Now</button>
-                </div>
-            `);
-            document.getElementById('modal-cancel-btn').classList.remove('hidden');
-            document.getElementById('modal-ok-btn').classList.add('hidden');
-        }
-
-        window.submitStudentWork = function() {
-            const name = document.getElementById('sub-name').value;
-            const msg = document.getElementById('sub-msg').value;
-            if (!name || !msg) {
-                showModal("Error", "Please fill in all fields before submitting.");
+                `;
+                document.getElementById('quiz-feedback-box').classList.add('hidden');
+                document.getElementById('quiz-next-btn').classList.add('hidden');
+                if (typeof confetti === 'function') confetti();
                 return;
             }
-            submissions.push({ studentName: name, message: msg });
-            closeModal();
-            showModal("Success", "Your submission has been successfully sent to Admin Daniel Chiro Bandari.");
-            renderAll();
+
+            const q = currentQuiz[quizIdx];
+            document.getElementById('quiz-progress-label').innerText = `Question ${quizIdx + 1} of ${currentQuiz.length}`;
+            document.getElementById('quiz-score-label').innerText = `Score: ${quizScore}`;
+            document.getElementById('quiz-question-text').innerText = q.q;
+
+            const optsDiv = document.getElementById('quiz-options-container');
+            optsDiv.innerHTML = q.options.map((opt, i) => `
+                <button onclick="selectQuizOpt(${i})" class="quiz-opt-btn w-full text-left p-3.5 rounded-xl glass border border-gray-200 dark:border-gray-700 hover:bg-emerald-50 font-semibold text-sm transition">
+                    ${opt}
+                </button>
+            `).join('');
+
+            document.getElementById('quiz-feedback-box').classList.add('hidden');
+            document.getElementById('quiz-next-btn').classList.add('hidden');
         }
 
-        window.openAddResourceModal = function() {
-            showModal("Add New Resource", "", `
+        function selectQuizOpt(idx) {
+            const q = currentQuiz[quizIdx];
+            const btns = document.querySelectorAll('.quiz-opt-btn');
+            btns.forEach((btn, i) => {
+                btn.disabled = true;
+                if (i === q.answer) btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800');
+                else if (i === idx) btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+            });
+
+            const fb = document.getElementById('quiz-feedback-box');
+            fb.classList.remove('hidden');
+            if (idx === q.answer) {
+                quizScore++;
+                fb.className = 'p-4 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-800';
+                fb.innerText = 'Correct answer!';
+            } else {
+                fb.className = 'p-4 rounded-xl text-sm font-bold bg-red-100 text-red-800';
+                fb.innerText = 'Incorrect option selected.';
+            }
+
+            document.getElementById('quiz-next-btn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            quizIdx++;
+            loadQuizQuestion();
+        }
+
+        // Tools Logic
+        function calculateScaleFactor() {
+            const l1 = parseFloat(document.getElementById('scale-l1').value) || 1;
+            const l2 = parseFloat(document.getElementById('scale-l2').value) || 1;
+            const a1 = parseFloat(document.getElementById('scale-a1').value) || 1;
+
+            const k = l2 / l1;
+            const k2 = k * k;
+            const a2 = a1 * k2;
+
+            document.getElementById('scale-result').innerText = `Linear Scale Factor (k) = ${k.toFixed(2)} | Area Scale Factor (k²) = ${k2.toFixed(2)} | Scaled Area (A₂) = ${a2.toFixed(2)}`;
+        }
+
+        function inspectCpu(component) {
+            const box = document.getElementById('cpu-info-box');
+            if (component === 'alu') box.innerText = "ALU (Arithmetic Logic Unit): Performs all binary arithmetic (addition, subtraction) and logical evaluations (AND, OR, NOT).";
+            if (component === 'cu') box.innerText = "Control Unit (CU): Decodes instructions and synchronizes data transfers across buses using clock pulses.";
+            if (component === 'ram') box.innerText = "Registers & Memory: Holds immediate operand data in Accumulator (ACC) and Program Counter (PC).";
+        }
+
+        function convertNumberSystem(source) {
+            const decInput = document.getElementById('num-dec');
+            const binInput = document.getElementById('num-bin');
+            const hexInput = document.getElementById('num-hex');
+
+            if (source === 'dec') {
+                const v = parseInt(decInput.value);
+                if (!isNaN(v)) {
+                    binInput.value = v.toString(2);
+                    hexInput.value = v.toString(16).toUpperCase();
+                }
+            } else if (source === 'bin') {
+                const v = parseInt(binInput.value, 2);
+                if (!isNaN(v)) {
+                    decInput.value = v;
+                    hexInput.value = v.toString(16).toUpperCase();
+                }
+            } else if (source === 'hex') {
+                const v = parseInt(hexInput.value, 16);
+                if (!isNaN(v)) {
+                    decInput.value = v;
+                    binInput.value = v.toString(2);
+                }
+            }
+        }
+
+        // Admin & Modal Logic
+        function unlockAdmin() {
+            const pass = document.getElementById('admin-passcode-input').value;
+            if (pass === 'admin124' || pass === '1234') {
+                document.getElementById('admin-lock-screen').classList.add('hidden');
+                document.getElementById('admin-dashboard-content').classList.remove('hidden');
+            } else {
+                showModal("Access Denied", "Incorrect passcode. Please try again.");
+            }
+        }
+
+        function saveAdminProfile() {
+            state.admin.name = document.getElementById('edit-admin-name').value;
+            state.admin.email = document.getElementById('edit-admin-email').value;
+            state.admin.phone = document.getElementById('edit-admin-phone').value;
+            state.admin.avatar = document.getElementById('edit-admin-avatar').value;
+            renderAll();
+            showModal("Profile Updated", "Admin contact details updated successfully.");
+        }
+
+        function openSubmissionModal() {
+            showModal("Submit Homework or Project", "", `
                 <div class="space-y-3">
-                    <input type="text" id="new-res-title" placeholder="Resource Title" class="w-full px-3 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
-                    <select id="new-res-cat" class="w-full px-3 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
+                    <input type="text" id="sub-student-name" placeholder="Your Full Name" class="w-full px-3 py-2 rounded-xl glass border text-sm">
+                    <textarea id="sub-student-msg" placeholder="Type your note or paste assignment link..." rows="3" class="w-full px-3 py-2 rounded-xl glass border text-sm"></textarea>
+                    <button onclick="submitWork()" class="w-full py-2 bg-emerald-600 text-white font-bold rounded-xl text-sm">Submit Now</button>
+                </div>
+            `);
+        }
+
+        function submitWork() {
+            const name = document.getElementById('sub-student-name').value;
+            const msg = document.getElementById('sub-student-msg').value;
+            if (!name || !msg) return;
+            state.submissions.push({ name, msg });
+            closeModal();
+            renderAll();
+            showModal("Success", "Your work has been submitted to Daniel Chiro Bandari.");
+        }
+
+        function openAddResourceModal() {
+            showModal("Add New Material", "", `
+                <div class="space-y-3">
+                    <input type="text" id="new-title" placeholder="Title" class="w-full px-3 py-2 rounded-xl glass border text-sm">
+                    <select id="new-cat" class="w-full px-3 py-2 rounded-xl glass border text-sm">
                         <option value="Mathematics">Mathematics</option>
                         <option value="Computer Studies">Computer Studies</option>
-                        <option value="General">General</option>
                     </select>
-                    <button onclick="confirmAddResource()" class="w-full py-2 bg-emerald-600 text-white font-semibold rounded-xl text-sm">Upload Resource</button>
+                    <button onclick="addResource()" class="w-full py-2 bg-emerald-600 text-white font-bold rounded-xl text-sm">Upload Material</button>
                 </div>
             `);
-            document.getElementById('modal-cancel-btn').classList.remove('hidden');
-            document.getElementById('modal-ok-btn').classList.add('hidden');
         }
 
-        window.confirmAddResource = function() {
-            const title = document.getElementById('new-res-title').value;
-            const cat = document.getElementById('new-res-cat').value;
-            if (!title) {
-                showModal("Error", "Please enter a resource title.");
-                return;
-            }
-            resources.push({ id: Date.now().toString(), title, category: cat, author: 'Daniel Chiro Bandari', type: 'PDF' });
+        function addResource() {
+            const title = document.getElementById('new-title').value;
+            const cat = document.getElementById('new-cat').value;
+            if (!title) return;
+            state.resources.push({ id: Date.now().toString(), title, category: cat, author: 'Daniel Chiro Bandari', type: 'PDF' });
             closeModal();
-            showModal("Success", "Resource added successfully.");
             renderAll();
         }
 
-        window.openAddAnnouncementModal = function() {
-            showModal("Post Announcement", "", `
-                <div class="space-y-3">
-                    <input type="text" id="new-ann-title" placeholder="Announcement Title" class="w-full px-3 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
-                    <textarea id="new-ann-content" placeholder="Announcement Details..." rows="3" class="w-full px-3 py-2 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm"></textarea>
-                    <button onclick="confirmAddAnnouncement()" class="w-full py-2 bg-blue-600 text-white font-semibold rounded-xl text-sm">Post Announcement</button>
-                </div>
-            `);
-            document.getElementById('modal-cancel-btn').classList.remove('hidden');
-            document.getElementById('modal-ok-btn').classList.add('hidden');
-        }
-
-        window.confirmAddAnnouncement = function() {
-            const title = document.getElementById('new-ann-title').value;
-            const content = document.getElementById('new-ann-content').value;
-            if (!title || !content) {
-                showModal("Error", "Please fill in all fields.");
-                return;
-            }
-            announcements.unshift({ id: Date.now().toString(), title, content, author: 'Daniel Chiro Bandari' });
-            closeModal();
-            showModal("Success", "Announcement posted successfully.");
+        function deleteResource(id) {
+            state.resources = state.resources.filter(r => r.id !== id);
             renderAll();
         }
 
-        window.deleteResource = function(id) {
-            resources = resources.filter(r => r.id !== id);
-            renderAll();
-            showModal("Deleted", "Resource removed successfully.");
+        function downloadResource(title) {
+            showModal("Download Started", `Preparing download for: "${title}".`);
         }
 
-        window.showModal = function(title, msg, htmlBody = '') {
+        function showModal(title, msg, customBody = '') {
             document.getElementById('modal-title').innerText = title;
-            document.getElementById('modal-message').innerText = msg;
-            document.getElementById('modal-body').innerHTML = htmlBody;
+            document.getElementById('modal-msg').innerText = msg;
+            document.getElementById('modal-custom-body').innerHTML = customBody;
             document.getElementById('custom-modal').classList.remove('hidden');
-            if (htmlBody) {
-                document.getElementById('modal-cancel-btn').classList.remove('hidden');
-                document.getElementById('modal-ok-btn').classList.add('hidden');
-            } else {
-                document.getElementById('modal-cancel-btn').classList.add('hidden');
-                document.getElementById('modal-ok-btn').classList.remove('hidden');
-            }
         }
 
-        window.closeModal = function() {
+        function closeModal() {
             document.getElementById('custom-modal').classList.add('hidden');
         }
 
-        function initLocalFallback() {
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
             renderAll();
-        }
-
-        function initFirestoreListeners() {
-            if (!db || !currentUser) return;
-            const resourcesRef = collection(db, 'artifacts', appId, 'public', 'data', 'resources');
-            onSnapshot(query(resourcesRef), (snapshot) => {
-                if (!snapshot.empty) {
-                    resources = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    renderAll();
-                }
-            }, (err) => {
-                console.warn("Firestore snapshot error:", err);
-                renderAll();
-            });
-            renderAll();
-        }
-
-        // Initial render on load
-        window.onload = function() {
-            renderAll();
-        }
+            loadQuizQuestion();
+        });
     </script>
 </body>
 </html>
