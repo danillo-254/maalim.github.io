@@ -108,7 +108,7 @@
                         <i class="fa-solid fa-microchip mr-1.5"></i> Tech & Innovations
                     </button>
                     <button onclick="switchTab('quizzes')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-600 hover:text-emerald-600 dark:text-gray-300" data-tab="quizzes">
-                        <i class="fa-solid fa-gamepad mr-1.5"></i> Quizzes & Games
+                        <i class="fa-solid fa-gamepad mr-1.5"></i> Quizzes & Arcade
                     </button>
                     <button onclick="switchTab('portal')" class="nav-btn px-3 py-2 rounded-lg text-sm font-semibold transition text-gray-600 hover:text-emerald-600 dark:text-gray-300" data-tab="portal">
                         <i class="fa-solid fa-user-graduate mr-1.5"></i> Student Portal
@@ -133,7 +133,7 @@
             <button onclick="switchTab('math'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-calculator mr-2 text-emerald-600"></i> Mathematics</button>
             <button onclick="switchTab('computer'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-laptop-code mr-2 text-blue-600"></i> Computer Studies</button>
             <button onclick="switchTab('techhub'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-microchip mr-2 text-indigo-600"></i> Tech & Innovations</button>
-            <button onclick="switchTab('quizzes'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-gamepad mr-2 text-amber-600"></i> Quizzes & Games</button>
+            <button onclick="switchTab('quizzes'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-gamepad mr-2 text-amber-600"></i> Quizzes & Arcade</button>
             <button onclick="switchTab('portal'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-gray-700 dark:text-gray-200 hover:bg-emerald-50 dark:hover:bg-gray-800"><i class="fa-solid fa-user-graduate mr-2 text-teal-600"></i> Student Portal</button>
             <button onclick="switchTab('admin'); toggleMobileMenu();" class="block w-full text-left px-3 py-2 rounded-md text-base font-semibold text-emerald-700 bg-emerald-50 dark:bg-gray-800"><i class="fa-solid fa-shield-halved mr-2"></i> Admin Panel</button>
         </div>
@@ -188,8 +188,8 @@
                     </div>
                     <div class="glass p-5 rounded-2xl shadow-sm text-center flex flex-col justify-center items-center">
                         <i class="fa-solid fa-gamepad text-2xl text-amber-500 mb-2"></i>
-                        <h4 class="text-2xl font-black text-gray-900 dark:text-white">3</h4>
-                        <p class="text-xs font-semibold text-gray-500">Quiz Games</p>
+                        <h4 class="text-2xl font-black text-gray-900 dark:text-white">5 Tracks</h4>
+                        <p class="text-xs font-semibold text-gray-500">Quizzes & Arcade</p>
                     </div>
                     <div class="glass p-5 rounded-2xl shadow-sm text-center flex flex-col justify-center items-center">
                         <i class="fa-solid fa-calculator text-2xl text-blue-600 mb-2"></i>
@@ -214,7 +214,7 @@
                         </div>
                         <div onclick="switchTab('quizzes')" class="glass p-4 rounded-xl cursor-pointer hover:border-amber-500 transition shadow-sm flex items-center space-x-3">
                             <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center font-bold"><i class="fa-solid fa-trophy"></i></div>
-                            <div><h4 class="font-bold text-sm">Speed Quiz</h4><p class="text-[11px] text-gray-500">Test Knowledge & Win</p></div>
+                            <div><h4 class="font-bold text-sm">Quizzes & Games</h4><p class="text-[11px] text-gray-500">5 Tracks & Arcade Games</p></div>
                         </div>
                     </div>
                 </div>
@@ -245,7 +245,7 @@
                 <div class="glass p-6 rounded-2xl shadow-sm space-y-3">
                     <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-lg font-bold"><i class="fa-solid fa-square-root-variable"></i></div>
                     <h3 class="font-bold text-lg text-gray-900 dark:text-white">Algebra & Quadratic Formula</h3>
-                    <p class="text-xs text-gray-500">Standard form: $ax^2 + bx + c = 0$</p>
+                    <p class="text-xs text-gray-500">Standard form: ax² + bx + c = 0</p>
                     <div class="bg-emerald-50 dark:bg-gray-800 p-3 rounded-xl font-mono text-xs text-emerald-800 dark:text-emerald-300">
                         x = [-b ± √(b² - 4ac)] / 2a
                     </div>
@@ -276,18 +276,18 @@
             <!-- Scale Factor & Geometry Tool -->
             <div class="glass p-6 rounded-3xl shadow-sm space-y-4">
                 <h3 class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-draw-polygon text-emerald-600 mr-2"></i> Scale Factor & Area Ratio Calculator</h3>
-                <p class="text-xs text-gray-500">Calculate linear scale factor ($k$), area scale factor ($k^2$), and volume scale factor ($k^3$).</p>
+                <p class="text-xs text-gray-500">Calculate linear scale factor (k), area scale factor (k²), and volume scale factor (k³).</p>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Original Length ($L_1$)</label>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Original Length (L₁)</label>
                         <input type="number" id="scale-l1" value="5" oninput="calculateScaleFactor()" class="w-full mt-1 p-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Enlarged Length ($L_2$)</label>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Enlarged Length (L₂)</label>
                         <input type="number" id="scale-l2" value="15" oninput="calculateScaleFactor()" class="w-full mt-1 p-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Original Area ($A_1$)</label>
+                        <label class="block text-xs font-semibold text-gray-600 dark:text-gray-300">Original Area (A₁)</label>
                         <input type="number" id="scale-a1" value="20" oninput="calculateScaleFactor()" class="w-full mt-1 p-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-sm">
                     </div>
                 </div>
@@ -358,7 +358,7 @@
                 <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Explore LEO Satellites, Mobile App Development, and Interactive Tech Terminology Flashcards.</p>
             </div>
 
-            <!-- Flashcards Section -->
+            <!-- Tech Flashcards -->
             <div class="space-y-4">
                 <h3 class="text-xl font-extrabold text-gray-900 dark:text-white">Interactive Tech Terminology Flashcards (Click to Flip)</h3>
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -405,34 +405,125 @@
             </div>
         </section>
 
-        <!-- ==================== 5. QUIZZES & GAMES TAB ==================== -->
-        <section id="tab-quizzes" class="tab-section hidden space-y-6">
+        <!-- ==================== 5. QUIZZES & GAMES TAB (EXPANDED) ==================== -->
+        <section id="tab-quizzes" class="tab-section hidden space-y-8">
             <div class="glass p-6 rounded-3xl shadow-sm border-t-4 border-amber-500 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div>
-                    <span class="px-3 py-1 bg-amber-100 dark:bg-amber-900 text-amber-700 text-xs font-bold rounded-full">Interactive Zone</span>
-                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Quizzes & Mini-Games</h2>
-                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Test your skill with instant scoring and confetti celebrations!</p>
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="startQuizMode('math')" id="btn-quiz-math" class="px-4 py-2 rounded-xl font-bold text-sm bg-emerald-600 text-white shadow">Math Quiz</button>
-                    <button onclick="startQuizMode('cs')" id="btn-quiz-cs" class="px-4 py-2 rounded-xl font-bold text-sm glass text-gray-700 dark:text-gray-200">CS Quiz</button>
+                    <span class="px-3 py-1 bg-amber-100 dark:bg-amber-900 text-amber-700 text-xs font-bold rounded-full">Interactive Arcade & STEM Quiz Center</span>
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white mt-1">Multi-Track Quizzes & Mini-Games</h2>
+                    <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">Test your mastery with 5 subject tracks (8+ questions each) and interactive educational arcade games!</p>
                 </div>
             </div>
 
-            <!-- Active Quiz Box -->
-            <div id="quiz-area" class="glass p-6 sm:p-8 rounded-3xl shadow-sm space-y-6 max-w-2xl mx-auto">
-                <div class="flex justify-between items-center text-sm font-bold text-gray-500">
-                    <span id="quiz-progress-label">Question 1 of 5</span>
+            <!-- Quiz Track Selector -->
+            <div class="glass p-4 rounded-2xl shadow-sm space-y-3">
+                <h3 class="font-bold text-sm text-gray-700 dark:text-gray-200">Select Quiz Subject & Level Track:</h3>
+                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                    <button onclick="startQuizMode('g10math')" id="track-g10math" class="track-btn p-3 rounded-xl font-bold text-xs bg-emerald-600 text-white shadow text-center">G10 Math: Trig & Vectors</button>
+                    <button onclick="startQuizMode('g10cs')" id="track-g10cs" class="track-btn p-3 rounded-xl font-bold text-xs glass text-gray-700 dark:text-gray-200 text-center">G10 CS: Von Neumann CPU</button>
+                    <button onclick="startQuizMode('g11math')" id="track-g11math" class="track-btn p-3 rounded-xl font-bold text-xs glass text-gray-700 dark:text-gray-200 text-center">G11 Math: Geometry & Scale</button>
+                    <button onclick="startQuizMode('g11cs')" id="track-g11cs" class="track-btn p-3 rounded-xl font-bold text-xs glass text-gray-700 dark:text-gray-200 text-center">G11 CS: Networking & Hex</button>
+                    <button onclick="startQuizMode('tech')" id="track-tech" class="track-btn p-3 rounded-xl font-bold text-xs glass text-gray-700 dark:text-gray-200 text-center">General Tech & AI</button>
+                </div>
+            </div>
+
+            <!-- Active Quiz Container -->
+            <div id="quiz-area" class="glass p-6 sm:p-8 rounded-3xl shadow-sm space-y-6 max-w-3xl mx-auto">
+                <div class="flex justify-between items-center text-sm font-bold text-gray-500 border-b pb-3 border-gray-200 dark:border-gray-700">
+                    <span id="quiz-progress-label">Question 1 of 8</span>
+                    <span id="quiz-timer-label" class="text-amber-600 font-mono"><i class="fa-regular fa-clock mr-1"></i> 20s</span>
                     <span id="quiz-score-label" class="text-emerald-600">Score: 0</span>
                 </div>
                 <div id="quiz-card" class="space-y-4">
-                    <h3 id="quiz-question-text" class="text-xl font-bold text-gray-900 dark:text-white">Loading Question...</h3>
+                    <h3 id="quiz-question-text" class="text-lg sm:text-xl font-bold text-gray-900 dark:text-white leading-relaxed">Loading Question...</h3>
                     <div id="quiz-options-container" class="grid grid-cols-1 gap-3">
                         <!-- Options generated dynamically -->
                     </div>
                 </div>
-                <div id="quiz-feedback-box" class="hidden p-4 rounded-xl text-sm font-semibold"></div>
-                <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden w-full py-3 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition">Next Question</button>
+                <div id="quiz-explanation-box" class="hidden p-4 rounded-2xl text-xs font-semibold bg-blue-50 dark:bg-gray-800 text-blue-900 dark:text-blue-200 border border-blue-200 dark:border-blue-700"></div>
+                <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition shadow">Next Question <i class="fa-solid fa-arrow-right ml-1"></i></button>
+            </div>
+
+            <!-- Arcade Educational Mini-Games Section -->
+            <div class="space-y-6 pt-6">
+                <h3 class="text-2xl font-extrabold text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-gamepad text-amber-500 mr-2.5"></i> Educational Mini-Games Arcade</h3>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Game 1: Math Speed Sprint -->
+                    <div class="glass p-6 rounded-3xl shadow-sm space-y-4 border-t-4 border-emerald-500">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-bolt text-emerald-500 mr-2"></i> Math Speed Sprint</h4>
+                            <span id="sprint-timer" class="px-3 py-1 bg-emerald-100 text-emerald-800 font-mono text-xs font-bold rounded-full">Time: 30s</span>
+                        </div>
+                        <p class="text-xs text-gray-500">Solve as many arithmetic equations as possible before time runs out!</p>
+                        
+                        <div id="sprint-game-box" class="bg-emerald-50/50 dark:bg-gray-800 p-6 rounded-2xl text-center space-y-4">
+                            <div class="text-3xl font-black text-gray-900 dark:text-white font-mono" id="sprint-problem">Press Start to Begin</div>
+                            <div class="flex justify-center space-x-2">
+                                <input type="number" id="sprint-answer" placeholder="Your Answer" disabled class="w-36 p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-center font-bold text-lg">
+                                <button onclick="checkSprintAnswer()" id="sprint-submit-btn" disabled class="px-4 py-2.5 bg-emerald-600 text-white font-bold rounded-xl">Submit</button>
+                            </div>
+                            <div class="flex justify-between items-center text-xs text-gray-500 pt-2">
+                                <span>Streak: <strong id="sprint-streak" class="text-emerald-600">0</strong></span>
+                                <span>Score: <strong id="sprint-score" class="text-emerald-600">0</strong></span>
+                            </div>
+                        </div>
+                        <button onclick="startMathSprint()" id="sprint-start-btn" class="w-full py-2.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 transition">Start Sprint Challenge</button>
+                    </div>
+
+                    <!-- Game 2: Binary & Hex Flash Challenge -->
+                    <div class="glass p-6 rounded-3xl shadow-sm space-y-4 border-t-4 border-indigo-500">
+                        <div class="flex justify-between items-center">
+                            <h4 class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-binary text-indigo-500 mr-2"></i> Binary & Hex Flash Puzzle</h4>
+                            <span class="px-3 py-1 bg-indigo-100 text-indigo-800 text-xs font-bold rounded-full">Base Conversion</span>
+                        </div>
+                        <p class="text-xs text-gray-500">Convert the given decimal number into its exact Binary or Hexadecimal format!</p>
+
+                        <div class="bg-indigo-50/50 dark:bg-gray-800 p-6 rounded-2xl text-center space-y-4">
+                            <div class="text-xs text-indigo-600 font-bold uppercase" id="hex-puzzle-type">Convert to Binary:</div>
+                            <div class="text-4xl font-black text-indigo-900 dark:text-indigo-300 font-mono" id="hex-puzzle-target">42</div>
+                            <div class="flex justify-center space-x-2">
+                                <input type="text" id="hex-puzzle-input" placeholder="e.g. 101010" class="w-48 p-2.5 rounded-xl border border-gray-300 dark:border-gray-700 text-center font-mono font-bold text-base uppercase">
+                                <button onclick="checkHexPuzzle()" class="px-4 py-2.5 bg-indigo-600 text-white font-bold rounded-xl">Verify</button>
+                            </div>
+                            <p id="hex-puzzle-feedback" class="text-xs font-bold text-gray-600 dark:text-gray-300">Score: <span id="hex-puzzle-score" class="text-indigo-600">0</span></p>
+                        </div>
+                        <button onclick="nextHexPuzzle()" class="w-full py-2.5 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition">New Conversion Puzzle</button>
+                    </div>
+
+                    <!-- Game 3: CPU Instruction Execution Simulator -->
+                    <div class="glass p-6 rounded-3xl shadow-sm space-y-4 border-t-4 border-blue-500 lg:col-span-2">
+                        <h4 class="font-bold text-lg text-gray-900 dark:text-white flex items-center"><i class="fa-solid fa-microchip text-blue-500 mr-2"></i> CPU Fetch-Decode-Execute Simulator Game</h4>
+                        <p class="text-xs text-gray-500">Step through CPU Machine Assembly instructions and inspect Register changes in real-time.</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                            <div class="bg-blue-50 dark:bg-gray-800 p-4 rounded-2xl space-y-2">
+                                <h5 class="font-bold text-xs text-blue-700 dark:text-blue-300 uppercase">1. Program Instructions</h5>
+                                <div class="font-mono text-xs space-y-1 text-gray-700 dark:text-gray-300">
+                                    <p id="inst-0" class="p-1 rounded bg-blue-200 dark:bg-blue-900 font-bold">0: LOAD 15 (Memory 101)</p>
+                                    <p id="inst-1" class="p-1 rounded">1: ADD 25 (Memory 102)</p>
+                                    <p id="inst-2" class="p-1 rounded">2: STORE ACC -> RAM</p>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-gray-800 p-4 rounded-2xl space-y-2">
+                                <h5 class="font-bold text-xs text-blue-700 dark:text-blue-300 uppercase">2. CPU Registers</h5>
+                                <div class="font-mono text-xs space-y-1 text-gray-700 dark:text-gray-300">
+                                    <p>Program Counter (PC): <span id="reg-pc" class="font-bold text-blue-600">0</span></p>
+                                    <p>Accumulator (ACC): <span id="reg-acc" class="font-bold text-emerald-600">0</span></p>
+                                    <p>Instruction Reg (IR): <span id="reg-ir" class="font-bold text-purple-600">None</span></p>
+                                </div>
+                            </div>
+                            <div class="bg-blue-50 dark:bg-gray-800 p-4 rounded-2xl space-y-2 flex flex-col justify-between">
+                                <h5 class="font-bold text-xs text-blue-700 dark:text-blue-300 uppercase">3. Execution State</h5>
+                                <p id="cpu-sim-status" class="text-xs font-semibold text-gray-600 dark:text-gray-300">Ready to execute Instruction 0.</p>
+                                <div class="flex gap-2">
+                                    <button onclick="stepCpuSim()" class="w-full py-2 bg-blue-600 text-white font-bold rounded-xl text-xs">Step Cycle</button>
+                                    <button onclick="resetCpuSim()" class="px-3 py-2 bg-gray-300 dark:bg-gray-700 text-xs font-bold rounded-xl">Reset</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
@@ -474,15 +565,23 @@
         <!-- ==================== 7. ADMIN DASHBOARD TAB ==================== -->
         <section id="tab-admin" class="tab-section hidden space-y-6">
             
-            <!-- Passcode Protection Guard -->
+            <!-- Passcode Protection Guard (Masked Password Input) -->
             <div id="admin-lock-screen" class="glass p-8 rounded-3xl shadow-lg max-w-md mx-auto text-center space-y-4">
                 <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-2xl font-bold mx-auto">
                     <i class="fa-solid fa-lock"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Admin Security Passcode</h3>
-                <p class="text-xs text-gray-500">Default passcode is <code class="bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono font-bold">admin124</code> or <code class="bg-gray-200 dark:bg-gray-700 px-1.5 py-0.5 rounded font-mono font-bold">1234</code></p>
-                <input type="password" id="admin-passcode-input" placeholder="Enter Admin Passcode" class="w-full px-4 py-2.5 rounded-xl glass border border-gray-300 dark:border-gray-700 text-center font-bold tracking-widest text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                <button onclick="unlockAdmin()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow transition">Unlock Dashboard</button>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Admin Security Access</h3>
+                <p class="text-xs text-gray-500">Please enter administrator access passcode to continue.</p>
+                
+                <!-- Masked Password Field with Eye Toggle -->
+                <div class="relative max-w-xs mx-auto">
+                    <input type="password" id="admin-passcode-input" placeholder="Enter Admin Passcode" class="w-full px-4 py-2.5 pr-10 rounded-xl glass border border-gray-300 dark:border-gray-700 text-center font-bold tracking-widest text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                    <button type="button" onclick="togglePasscodeVisibility()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-emerald-600">
+                        <i id="passcode-eye-icon" class="fa-solid fa-eye"></i>
+                    </button>
+                </div>
+
+                <button onclick="unlockAdmin()" class="w-full max-w-xs mx-auto py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow transition">Unlock Dashboard</button>
             </div>
 
             <!-- Main Admin Panel (Hidden until unlocked) -->
@@ -584,12 +683,66 @@
                 { id: '4', title: 'Computer Networks & Topologies Notes', category: 'Computer Studies', author: 'Daniel Chiro Bandari', type: 'Doc' }
             ],
             announcements: [
-                { id: '1', title: 'Welcome to Maalim-Kenya Education Hub', content: 'Explore interactive math formulas, CPU simulators, and downloadable KCSE study guides.', author: 'Daniel Chiro Bandari' }
+                { id: '1', title: 'Welcome to Maalim-Kenya Education Hub', content: 'Explore interactive math formulas, CPU simulators, arcade games, and downloadable KCSE study guides.', author: 'Daniel Chiro Bandari' }
             ],
             submissions: []
         };
 
-        // Standardized Switch Tab function using explicit class addition/removal
+        // Multi-Track Comprehensive Quiz Question Database (8+ questions per track)
+        const quizTracks = {
+            g10math: [
+                { q: "1. What is the derivative of f(x) = 3x² + 4x - 5 with respect to x?", options: ["6x + 4", "3x + 4", "6x² + 4", "6x - 5"], answer: 0, exp: "Using the power rule: d/dx(3x²) = 6x and d/dx(4x) = 4." },
+                { q: "2. In a right triangle, if sin(θ) = 3/5, what is tan(θ)?", options: ["3/4", "4/5", "4/3", "5/3"], answer: 0, exp: "Adjacent side = √(5² - 3²) = 4. Therefore, tan(θ) = Opp/Adj = 3/4." },
+                { q: "3. Convert 120° into radians in terms of π.", options: ["2π/3 rad", "3π/4 rad", "π/3 rad", "5π/6 rad"], answer: 0, exp: "120° × (π / 180°) = 2π/3 radians." },
+                { q: "4. Given vector A = 3i + 4j, what is its magnitude |A|?", options: ["5", "7", "25", "1"], answer: 0, exp: "|A| = √(3² + 4²) = √(9 + 16) = √25 = 5." },
+                { q: "5. Find the roots of x² - 5x + 6 = 0.", options: ["x = 2, 3", "x = -2, -3", "x = 1, 6", "x = -1, -6"], answer: 0, exp: "(x - 2)(x - 3) = 0 => x = 2 or x = 3." },
+                { q: "6. Solve for x: 2^(x+1) = 16.", options: ["3", "4", "2", "5"], answer: 0, exp: "2^(x+1) = 2^4 => x + 1 = 4 => x = 3." },
+                { q: "7. What is the gradient of the line passing through (2, 3) and (6, 11)?", options: ["2", "4", "0.5", "8"], answer: 0, exp: "m = (11 - 3)/(6 - 2) = 8/4 = 2." },
+                { q: "8. Evaluate cos(60°).", options: ["1/2", "√3/2", "1", "0"], answer: 0, exp: "Standard exact trig ratio: cos(60°) = 0.5." }
+            ],
+            g10cs: [
+                { q: "1. Which CPU component is responsible for mathematical calculations and logical evaluations?", options: ["ALU (Arithmetic Logic Unit)", "Control Unit", "Registers", "Bus"], answer: 0, exp: "The ALU executes arithmetic operations (+, -) and logic gates (AND, OR)." },
+                { q: "2. Which register holds the memory address of the NEXT instruction to be executed?", options: ["Program Counter (PC)", "Accumulator (ACC)", "Instruction Register (IR)", "Memory Data Register (MDR)"], answer: 0, exp: "The Program Counter increments automatically after fetching an instruction." },
+                { q: "3. In Von Neumann architecture, both program instructions and data share the same memory.", options: ["True", "False"], answer: 0, exp: "A key feature of Von Neumann architecture is shared memory for data and instructions." },
+                { q: "4. What is the main characteristic of RAM memory?", options: ["Volatile (loses data on power loss)", "Non-volatile", "Read-Only", "Permanent Optical Storage"], answer: 0, exp: "RAM requires electrical power to retain temporary state." },
+                { q: "5. What happens during the 'Fetch' stage of the CPU cycle?", options: ["Retrieves instruction from RAM into IR", "Decodes opcode", "Executes ALU operation", "Writes back to hard drive"], answer: 0, exp: "Fetch fetches the next instruction byte from main RAM address." },
+                { q: "6. How many bits are in 1 Byte?", options: ["8 bits", "4 bits", "16 bits", "1024 bits"], answer: 0, exp: "1 Byte = 8 binary bits." },
+                { q: "7. Which bus carries memory addresses from CPU to RAM?", options: ["Address Bus", "Data Bus", "Control Bus", "USB"], answer: 0, exp: "The Address Bus is unidirectional from CPU to system memory." },
+                { q: "8. What is opcode in assembly language?", options: ["Operation code specifying the instruction", "Variable value", "RAM slot number", "GPU core"], answer: 0, exp: "Opcode (e.g. LOAD, ADD) tells the Control Unit what action to take." }
+            ],
+            g11math: [
+                { q: "1. If a triangle with area 10 cm² is enlarged by scale factor k = 3, what is its new area?", options: ["90 cm²", "30 cm²", "60 cm²", "100 cm²"], answer: 0, exp: "Area Scale Factor = k² = 3² = 9. New Area = 10 × 9 = 90 cm²." },
+                { q: "2. Find the midpoint of segment connecting A(-2, 4) and B(6, 10).", options: ["(2, 7)", "(4, 7)", "(2, 14)", "(4, 3)"], answer: 0, exp: "Midpoint = ((-2+6)/2, (4+10)/2) = (2, 7)." },
+                { q: "3. What is the equation of a straight line perpendicular to y = 2x + 1 through origin?", options: ["y = -0.5x", "y = -2x", "y = 0.5x", "y = 2x"], answer: 0, exp: "Perpendicular slope m₂ = -1/m₁ = -1/2 = -0.5." },
+                { q: "4. If linear scale factor k = 2, what is the volume scale factor k³?", options: ["8", "4", "6", "16"], answer: 0, exp: "Volume scale factor = k³ = 2³ = 8." },
+                { q: "5. Find distance between (1, 2) and (4, 6).", options: ["5", "25", "7", "√(10)"], answer: 0, exp: "d = √[(4-1)² + (6-2)²] = √(9 + 16) = √25 = 5." },
+                { q: "6. In circle geometry, the angle subtended by an arc at the center is ____ that at the circumference.", options: ["Double", "Half", "Equal to", "Triple"], answer: 0, exp: "Central angle theorem: central angle is twice the angle at circumference." },
+                { q: "7. What is log10(1000)?", options: ["3", "100", "10", "30"], answer: 0, exp: "10³ = 1000, so log10(1000) = 3." },
+                { q: "8. Solve 3x - 7 = 2x + 5.", options: ["x = 12", "x = -2", "x = 2", "x = 35"], answer: 0, exp: "3x - 2x = 5 + 7 => x = 12." }
+            ],
+            g11cs: [
+                { q: "1. Convert Decimal 255 to Hexadecimal format.", options: ["FF", "FE", "100", "AA"], answer: 0, exp: "255 = 15×16 + 15 = 0xFF." },
+                { q: "2. Which network topology uses a single central switch or hub?", options: ["Star Topology", "Bus Topology", "Ring Topology", "Mesh Topology"], answer: 0, exp: "Star topology routes all node traffic through a central switch." },
+                { q: "3. What is the main advantage of Mesh Topology?", options: ["High redundancy & fault tolerance", "Cheapest cable cost", "No switch required", "Fastest setup"], answer: 0, exp: "Mesh provides multiple redundant pathways between nodes." },
+                { q: "4. What binary value represents Decimal 10?", options: ["1010", "1001", "1100", "0111"], answer: 0, exp: "8 + 2 = 10 => Binary 1010." },
+                { q: "5. What protocol assigns dynamic IP addresses automatically?", options: ["DHCP", "DNS", "HTTP", "FTP"], answer: 0, exp: "Dynamic Host Configuration Protocol handles automatic IP leasing." },
+                { q: "6. Which layer of the OSI model handles physical MAC addresses?", options: ["Data Link Layer", "Network Layer", "Transport Layer", "Physical Layer"], answer: 0, exp: "Layer 2 (Data Link) deals with physical hardware MAC addressing." },
+                { q: "7. What does HTTP stand for?", options: ["Hypertext Transfer Protocol", "High Text Protocol", "Hyper Transfer Terminal", "Hybrid Text Server"], answer: 0, exp: "HTTP transfers web assets over port 80/443." },
+                { q: "8. What is hexadecimal Base?", options: ["Base 16", "Base 2", "Base 8", "Base 10"], answer: 0, exp: "Hexadecimal uses digits 0-9 and letters A-F (16 symbols)." }
+            ],
+            tech: [
+                { q: "1. What altitude range do Low Earth Orbit (LEO) satellites operate in?", options: ["160 km to 2,000 km", "35,786 km", "50 km", "10,000 km"], answer: 0, exp: "LEO satellites orbit close to Earth (160-2000 km) for lower internet latency." },
+                { q: "2. Which AI subfield focuses on training models using deep neural network layers?", options: ["Deep Learning", "Expert Systems", "Symbolic Logic", "SQL Queries"], answer: 0, exp: "Deep Learning utilizes artificial neural networks with multiple hidden layers." },
+                { q: "3. What platform is commonly used for block-based Android App development?", options: ["Kodular / MIT App Inventor", "Photoshop", "Docker", "Excel"], answer: 0, exp: "Kodular provides visual block programming for native Android applications." },
+                { q: "4. What does IoT stand for?", options: ["Internet of Things", "Input Output Technology", "Internal Operating Tool", "Integrated Open Network"], answer: 0, exp: "IoT refers to physical devices connected to the internet sharing sensor data." },
+                { q: "5. What is the primary function of an API?", options: ["Enables communication between software applications", "Protects RAM", "Formats HTML", "Calculates GPU clock speed"], answer: 0, exp: "Application Programming Interfaces define standard request/response endpoints." },
+                { q: "6. What technology underpins cryptocurrencies and decentralized ledgers?", options: ["Blockchain", "Relational Database", "Cloud RAM", "FTP Server"], answer: 0, exp: "Blockchain uses cryptographic blocks to maintain an immutable distributed ledger." },
+                { q: "7. What is cloud computing?", options: ["On-demand delivery of IT resources over the internet", "Local hard drive storage", "Satellite TV broadcasting", "Solar energy grid"], answer: 0, exp: "Cloud computing provides scalable remote servers, databases, and storage." },
+                { q: "8. What is Starlink?", options: ["LEO Satellite constellation by SpaceX for global satellite internet", "A mobile phone manufacturer", "A high-speed train", "A programming language"], answer: 0, exp: "Starlink deploys thousands of LEO satellites to provide broadband internet worldwide." }
+            ]
+        };
+
+        // Standardized Switch Tab function
         function switchTab(tabId) {
             console.log("Switching tab to:", tabId);
             
@@ -597,7 +750,7 @@
             const sections = document.querySelectorAll('.tab-section');
             sections.forEach(sec => sec.classList.add('hidden'));
 
-            // Remove active style from desktop nav buttons
+            // Reset active style on desktop nav buttons
             const navBtns = document.querySelectorAll('.nav-btn');
             navBtns.forEach(btn => {
                 btn.classList.remove('text-emerald-600', 'bg-emerald-50', 'dark:bg-gray-800');
@@ -608,8 +761,6 @@
             const targetSection = document.getElementById(`tab-${tabId}`);
             if (targetSection) {
                 targetSection.classList.remove('hidden');
-            } else {
-                console.error("Tab section not found:", `tab-${tabId}`);
             }
 
             // Target button
@@ -713,82 +864,103 @@
             `).join('');
         }
 
-        // Quiz Logic with Confetti
-        const mathQuestions = [
-            { q: "What is the derivative of x²?", options: ["2x", "x", "x²", "2"], answer: 0 },
-            { q: "Solve for x: 2x + 4 = 12", options: ["x = 2", "x = 4", "x = 6", "x = 8"], answer: 1 },
-            { q: "What is the area of a circle with radius 7? (π = 22/7)", options: ["154", "44", "88", "308"], answer: 0 }
-        ];
-
-        const csQuestions = [
-            { q: "Which component executes calculations inside the CPU?", options: ["Control Unit", "ALU", "RAM", "ROM"], answer: 1 },
-            { q: "What is 255 in binary?", options: ["11111111", "10000000", "11110000", "10101010"], answer: 0 },
-            { q: "Which topology connects all nodes to a single central hub?", options: ["Bus", "Ring", "Star", "Mesh"], answer: 2 }
-        ];
-
-        let currentQuiz = mathQuestions;
+        // Quiz State Management
+        let currentQuizKey = 'g10math';
+        let currentQuizQuestions = quizTracks.g10math;
         let quizIdx = 0;
         let quizScore = 0;
+        let quizTimerInterval = null;
+        let quizTimeLeft = 20;
 
-        function startQuizMode(type) {
-            currentQuiz = type === 'math' ? mathQuestions : csQuestions;
+        function startQuizMode(trackKey) {
+            currentQuizKey = trackKey;
+            currentQuizQuestions = quizTracks[trackKey] || quizTracks.g10math;
             quizIdx = 0;
             quizScore = 0;
-            document.getElementById('btn-quiz-math').className = type === 'math' ? 'px-4 py-2 rounded-xl font-bold text-sm bg-emerald-600 text-white shadow' : 'px-4 py-2 rounded-xl font-bold text-sm glass text-gray-700 dark:text-gray-200';
-            document.getElementById('btn-quiz-cs').className = type === 'cs' ? 'px-4 py-2 rounded-xl font-bold text-sm bg-emerald-600 text-white shadow' : 'px-4 py-2 rounded-xl font-bold text-sm glass text-gray-700 dark:text-gray-200';
+
+            // Highlight active button
+            document.querySelectorAll('.track-btn').forEach(btn => {
+                btn.className = 'track-btn p-3 rounded-xl font-bold text-xs glass text-gray-700 dark:text-gray-200 text-center';
+            });
+            const activeBtn = document.getElementById(`track-${trackKey}`);
+            if (activeBtn) {
+                activeBtn.className = 'track-btn p-3 rounded-xl font-bold text-xs bg-emerald-600 text-white shadow text-center';
+            }
+
             loadQuizQuestion();
         }
 
         function loadQuizQuestion() {
-            if (quizIdx >= currentQuiz.length) {
+            clearInterval(quizTimerInterval);
+            if (quizIdx >= currentQuizQuestions.length) {
                 // Quiz Completed
                 document.getElementById('quiz-card').innerHTML = `
                     <div class="text-center py-6 space-y-4">
-                        <h3 class="text-2xl font-black text-gray-900 dark:text-white">Quiz Completed! 🎉</h3>
-                        <p class="text-lg font-bold">Final Score: <span class="text-emerald-600">${quizScore} / ${currentQuiz.length}</span></p>
-                        <button onclick="startQuizMode('${currentQuiz === mathQuestions ? 'math' : 'cs'}')" class="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-xl shadow">Retake Quiz</button>
+                        <h3 class="text-2xl font-black text-gray-900 dark:text-white">Track Completed! 🎉</h3>
+                        <p class="text-lg font-bold">Your Score: <span class="text-emerald-600">${quizScore} / ${currentQuizQuestions.length}</span></p>
+                        <p class="text-xs text-gray-500">Percentage: ${Math.round((quizScore/currentQuizQuestions.length)*100)}%</p>
+                        <button onclick="startQuizMode('${currentQuizKey}')" class="px-6 py-2.5 bg-emerald-600 text-white font-bold rounded-xl shadow hover:bg-emerald-700 transition">Retake Track</button>
                     </div>
                 `;
-                document.getElementById('quiz-feedback-box').classList.add('hidden');
+                document.getElementById('quiz-explanation-box').classList.add('hidden');
                 document.getElementById('quiz-next-btn').classList.add('hidden');
+                document.getElementById('quiz-timer-label').innerText = `--`;
                 if (typeof confetti === 'function') confetti();
                 return;
             }
 
-            const q = currentQuiz[quizIdx];
-            document.getElementById('quiz-progress-label').innerText = `Question ${quizIdx + 1} of ${currentQuiz.length}`;
+            const q = currentQuizQuestions[quizIdx];
+            document.getElementById('quiz-progress-label').innerText = `Question ${quizIdx + 1} of ${currentQuizQuestions.length}`;
             document.getElementById('quiz-score-label').innerText = `Score: ${quizScore}`;
             document.getElementById('quiz-question-text').innerText = q.q;
 
             const optsDiv = document.getElementById('quiz-options-container');
             optsDiv.innerHTML = q.options.map((opt, i) => `
-                <button onclick="selectQuizOpt(${i})" class="quiz-opt-btn w-full text-left p-3.5 rounded-xl glass border border-gray-200 dark:border-gray-700 hover:bg-emerald-50 font-semibold text-sm transition">
-                    ${opt}
+                <button onclick="selectQuizOpt(${i})" class="quiz-opt-btn w-full text-left p-3.5 rounded-xl glass border border-gray-200 dark:border-gray-700 hover:bg-emerald-50 font-semibold text-sm transition flex items-center justify-between">
+                    <span>${opt}</span>
+                    <i class="fa-regular fa-circle text-gray-300"></i>
                 </button>
             `).join('');
 
-            document.getElementById('quiz-feedback-box').classList.add('hidden');
+            document.getElementById('quiz-explanation-box').classList.add('hidden');
             document.getElementById('quiz-next-btn').classList.add('hidden');
+
+            // Countdown timer reset
+            quizTimeLeft = 20;
+            document.getElementById('quiz-timer-label').innerText = `${quizTimeLeft}s`;
+            quizTimerInterval = setInterval(() => {
+                quizTimeLeft--;
+                document.getElementById('quiz-timer-label').innerText = `${quizTimeLeft}s`;
+                if (quizTimeLeft <= 0) {
+                    clearInterval(quizTimerInterval);
+                    selectQuizOpt(-1); // Timeout penalty
+                }
+            }, 1000);
         }
 
         function selectQuizOpt(idx) {
-            const q = currentQuiz[quizIdx];
+            clearInterval(quizTimerInterval);
+            const q = currentQuizQuestions[quizIdx];
             const btns = document.querySelectorAll('.quiz-opt-btn');
+            
             btns.forEach((btn, i) => {
                 btn.disabled = true;
-                if (i === q.answer) btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800');
-                else if (i === idx) btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                if (i === q.answer) {
+                    btn.classList.add('bg-emerald-100', 'border-emerald-500', 'text-emerald-800');
+                    btn.querySelector('i').className = 'fa-solid fa-circle-check text-emerald-600';
+                } else if (i === idx) {
+                    btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                    btn.querySelector('i').className = 'fa-solid fa-circle-xmark text-red-600';
+                }
             });
 
-            const fb = document.getElementById('quiz-feedback-box');
-            fb.classList.remove('hidden');
+            const expBox = document.getElementById('quiz-explanation-box');
+            expBox.classList.remove('hidden');
             if (idx === q.answer) {
                 quizScore++;
-                fb.className = 'p-4 rounded-xl text-sm font-bold bg-emerald-100 text-emerald-800';
-                fb.innerText = 'Correct answer!';
+                expBox.innerHTML = `<strong class="text-emerald-700"><i class="fa-solid fa-check mr-1"></i> Correct!</strong> ${q.exp}`;
             } else {
-                fb.className = 'p-4 rounded-xl text-sm font-bold bg-red-100 text-red-800';
-                fb.innerText = 'Incorrect option selected.';
+                expBox.innerHTML = `<strong class="text-red-700"><i class="fa-solid fa-xmark mr-1"></i> ${idx === -1 ? 'Time Out!' : 'Incorrect.'}</strong> ${q.exp}`;
             }
 
             document.getElementById('quiz-next-btn').classList.remove('hidden');
@@ -799,7 +971,144 @@
             loadQuizQuestion();
         }
 
-        // Tools Logic
+        // ==================== MINI-GAMES ARCADE LOGIC ====================
+
+        // Game 1: Math Speed Sprint
+        let sprintActive = false;
+        let sprintScoreVal = 0;
+        let sprintStreakVal = 0;
+        let sprintTimeLeft = 30;
+        let sprintTimerInterval = null;
+        let sprintAnsCurrent = 0;
+
+        function startMathSprint() {
+            sprintActive = true;
+            sprintScoreVal = 0;
+            sprintStreakVal = 0;
+            sprintTimeLeft = 30;
+            document.getElementById('sprint-score').innerText = '0';
+            document.getElementById('sprint-streak').innerText = '0';
+            document.getElementById('sprint-answer').disabled = false;
+            document.getElementById('sprint-submit-btn').disabled = false;
+            document.getElementById('sprint-start-btn').disabled = true;
+            generateSprintProblem();
+
+            sprintTimerInterval = setInterval(() => {
+                sprintTimeLeft--;
+                document.getElementById('sprint-timer').innerText = `Time: ${sprintTimeLeft}s`;
+                if (sprintTimeLeft <= 0) {
+                    clearInterval(sprintTimerInterval);
+                    sprintActive = false;
+                    document.getElementById('sprint-problem').innerText = "Game Over!";
+                    document.getElementById('sprint-answer').disabled = true;
+                    document.getElementById('sprint-submit-btn').disabled = true;
+                    document.getElementById('sprint-start-btn').disabled = false;
+                    showModal("Sprint Finished!", `Great job! Total Score: ${sprintScoreVal} with max streak of ${sprintStreakVal}.`);
+                }
+            }, 1000);
+        }
+
+        function generateSprintProblem() {
+            const n1 = Math.floor(Math.random() * 12) + 2;
+            const n2 = Math.floor(Math.random() * 12) + 2;
+            const ops = ['+', '-', '×'];
+            const op = ops[Math.floor(Math.random() * ops.length)];
+
+            if (op === '+') sprintAnsCurrent = n1 + n2;
+            else if (op === '-') sprintAnsCurrent = n1 - n2;
+            else sprintAnsCurrent = n1 * n2;
+
+            document.getElementById('sprint-problem').innerText = `${n1} ${op} ${n2} = ?`;
+            document.getElementById('sprint-answer').value = '';
+            document.getElementById('sprint-answer').focus();
+        }
+
+        function checkSprintAnswer() {
+            if (!sprintActive) return;
+            const userAns = parseInt(document.getElementById('sprint-answer').value);
+            if (userAns === sprintAnsCurrent) {
+                sprintScoreVal += 10;
+                sprintStreakVal++;
+                document.getElementById('sprint-score').innerText = sprintScoreVal;
+                document.getElementById('sprint-streak').innerText = sprintStreakVal;
+            } else {
+                sprintStreakVal = 0;
+                document.getElementById('sprint-streak').innerText = '0';
+            }
+            generateSprintProblem();
+        }
+
+        // Game 2: Binary & Hex Flash Puzzle
+        let hexTargetVal = 42;
+        let hexMode = 'bin'; // 'bin' or 'hex'
+        let hexPuzzleScoreVal = 0;
+
+        function nextHexPuzzle() {
+            hexTargetVal = Math.floor(Math.random() * 200) + 10;
+            hexMode = Math.random() > 0.5 ? 'bin' : 'hex';
+
+            document.getElementById('hex-puzzle-target').innerText = hexTargetVal;
+            document.getElementById('hex-puzzle-type').innerText = hexMode === 'bin' ? 'Convert Decimal to Binary:' : 'Convert Decimal to Hexadecimal:';
+            document.getElementById('hex-puzzle-input').value = '';
+        }
+
+        function checkHexPuzzle() {
+            const val = document.getElementById('hex-puzzle-input').value.trim().toUpperCase();
+            const correctVal = hexMode === 'bin' ? hexTargetVal.toString(2) : hexTargetVal.toString(16).toUpperCase();
+
+            if (val === correctVal) {
+                hexPuzzleScoreVal += 15;
+                document.getElementById('hex-puzzle-score').innerText = hexPuzzleScoreVal;
+                showModal("Correct Conversion!", `${hexTargetVal} in Base ${hexMode === 'bin' ? '2' : '16'} is indeed ${correctVal}. +15 points!`);
+                nextHexPuzzle();
+            } else {
+                showModal("Incorrect Conversion", `Expected ${correctVal}, but got ${val}. Try again!`);
+            }
+        }
+
+        // Game 3: CPU Instruction Execution Simulator
+        let cpuSimState = { pc: 0, acc: 0, ir: "None" };
+
+        function stepCpuSim() {
+            // Un-highlight previous
+            [0, 1, 2].forEach(i => document.getElementById(`inst-${i}`).className = "p-1 rounded");
+
+            if (cpuSimState.pc === 0) {
+                cpuSimState.ir = "LOAD 15";
+                cpuSimState.acc = 15;
+                cpuSimState.pc = 1;
+                document.getElementById('inst-0').className = "p-1 rounded bg-blue-200 dark:bg-blue-900 font-bold";
+                document.getElementById('cpu-sim-status').innerText = "Fetched & Executed LOAD 15. ACC updated to 15.";
+            } else if (cpuSimState.pc === 1) {
+                cpuSimState.ir = "ADD 25";
+                cpuSimState.acc += 25;
+                cpuSimState.pc = 2;
+                document.getElementById('inst-1').className = "p-1 rounded bg-blue-200 dark:bg-blue-900 font-bold";
+                document.getElementById('cpu-sim-status').innerText = "Fetched & Executed ADD 25. ACC updated to 40.";
+            } else if (cpuSimState.pc === 2) {
+                cpuSimState.ir = "STORE ACC";
+                document.getElementById('inst-2').className = "p-1 rounded bg-blue-200 dark:bg-blue-900 font-bold";
+                document.getElementById('cpu-sim-status').innerText = "Stored ACC value (40) into Main RAM memory location 103.";
+                cpuSimState.pc = 3;
+            } else {
+                document.getElementById('cpu-sim-status').innerText = "Program execution finished. Click Reset to run again.";
+            }
+
+            document.getElementById('reg-pc').innerText = cpuSimState.pc;
+            document.getElementById('reg-acc').innerText = cpuSimState.acc;
+            document.getElementById('reg-ir').innerText = cpuSimState.ir;
+        }
+
+        function resetCpuSim() {
+            cpuSimState = { pc: 0, acc: 0, ir: "None" };
+            [0, 1, 2].forEach(i => document.getElementById(`inst-${i}`).className = "p-1 rounded");
+            document.getElementById('reg-pc').innerText = '0';
+            document.getElementById('reg-acc').innerText = '0';
+            document.getElementById('reg-ir').innerText = 'None';
+            document.getElementById('cpu-sim-status').innerText = "Ready to execute Instruction 0.";
+        }
+
+        // Math & CPU Tools Logic
         function calculateScaleFactor() {
             const l1 = parseFloat(document.getElementById('scale-l1').value) || 1;
             const l2 = parseFloat(document.getElementById('scale-l2').value) || 1;
@@ -845,14 +1154,27 @@
             }
         }
 
-        // Admin & Modal Logic
+        // Admin Authentication & Password Masking Logic
+        function togglePasscodeVisibility() {
+            const input = document.getElementById('admin-passcode-input');
+            const icon = document.getElementById('passcode-eye-icon');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fa-solid fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fa-solid fa-eye';
+            }
+        }
+
         function unlockAdmin() {
             const pass = document.getElementById('admin-passcode-input').value;
-            if (pass === 'admin124' || pass === '1234') {
+            // Strict passcode requirement: edu14415
+            if (pass === 'edu14415') {
                 document.getElementById('admin-lock-screen').classList.add('hidden');
                 document.getElementById('admin-dashboard-content').classList.remove('hidden');
             } else {
-                showModal("Access Denied", "Incorrect passcode. Please try again.");
+                showModal("Access Denied", "Incorrect passcode entered. Please check your credentials.");
             }
         }
 
@@ -898,6 +1220,25 @@
             `);
         }
 
+        function openAddAnnouncementModal() {
+            showModal("Post Notice Announcement", "", `
+                <div class="space-y-3">
+                    <input type="text" id="ann-title" placeholder="Notice Title" class="w-full px-3 py-2 rounded-xl glass border text-sm">
+                    <textarea id="ann-content" placeholder="Announcement content..." rows="3" class="w-full px-3 py-2 rounded-xl glass border text-sm"></textarea>
+                    <button onclick="addAnnouncement()" class="w-full py-2 bg-blue-600 text-white font-bold rounded-xl text-sm">Post Notice</button>
+                </div>
+            `);
+        }
+
+        function addAnnouncement() {
+            const title = document.getElementById('ann-title').value;
+            const content = document.getElementById('ann-content').value;
+            if (!title || !content) return;
+            state.announcements.unshift({ id: Date.now().toString(), title, content, author: 'Daniel Chiro Bandari' });
+            closeModal();
+            renderAll();
+        }
+
         function addResource() {
             const title = document.getElementById('new-title').value;
             const cat = document.getElementById('new-cat').value;
@@ -927,10 +1268,11 @@
             document.getElementById('custom-modal').classList.add('hidden');
         }
 
-        // Initialize on load
+        // Initialize on page load
         window.addEventListener('DOMContentLoaded', () => {
             renderAll();
-            loadQuizQuestion();
+            startQuizMode('g10math');
+            nextHexPuzzle();
         });
     </script>
 </body>
