@@ -1,654 +1,851 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maalim's Resource and Study Platform</title>
+    <title>MAALIM-KENYA EDUCATION HUB</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --bg: #f4f6f9;
-            --white: #ffffff;
-            --danger: #e74c3c;
-            --success: #27ae60;
-            --whatsapp: #25D366;
+        .glass {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
         }
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: var(--bg);
-            color: #333;
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.85);
+            border: 1px solid rgba(255, 255, 255, 0.08);
         }
-        header {
-            background-color: var(--primary);
-            color: var(--white);
-            padding: 20px;
-            text-align: center;
+        .gradient-text {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #db2777 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .container {
-            max-width: 900px;
-            margin: 20px auto;
-            background: var(--white);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        .pulse-badge {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
-        .nav-buttons {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            background: #eef2f7;
-            padding: 10px;
-            border-radius: 6px;
-        }
-        button {
-            background-color: var(--accent);
-            color: var(--white);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        button:hover {
-            opacity: 0.9;
-        }
-        button.danger {
-            background-color: var(--danger);
-        }
-        button.success {
-            background-color: var(--success);
-        }
-        .whatsapp-btn {
-            background-color: var(--whatsapp);
-            color: white;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            text-decoration: none;
-            padding: 10px 18px;
-            border-radius: 5px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
-        .whatsapp-btn:hover {
-            opacity: 0.9;
-        }
-        .panel {
-            display: none;
-        }
-        .panel.active {
-            display: block;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 8px;
-            margin: 8px 0 15px 0;
-            box-sizing: border-box;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .password-container {
-            position: relative;
-        }
-        .password-container input {
-            padding-right: 40px;
-        }
-        .toggle-password {
-            position: absolute;
-            right: 10px;
-            top: 35%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            font-size: 14px;
-            color: #666;
-            background: none;
-            border: none;
-            padding: 0;
-            font-weight: normal;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-        .contact-box {
-            background: #e8f4f8;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 25px;
-            border-left: 4px solid var(--accent);
-        }
-        .auth-card {
-            background: #fafafa;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            margin-bottom: 20px;
-        }
-        /* Modal Viewer Styling */
-        #mediaModal {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            align-items: center;
-            justify-content: center;
-        }
-        .modal-content {
-            background: var(--white);
-            padding: 20px;
-            border-radius: 8px;
-            max-width: 750px;
-            width: 90%;
-            position: relative;
-            max-height: 85vh;
-            overflow-y: auto;
-            text-align: center;
-        }
-        .modal-content img, .modal-content video {
-            max-width: 100%;
-            max-height: 55vh;
-            border-radius: 4px;
-            margin-top: 10px;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .5; }
         }
     </style>
-
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 </head>
-<body>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 font-sans min-h-full flex flex-col antialiased selection:bg-blue-500 selection:text-white">
 
-    <header>
-        <h1>Welcome to Maalim's Resource and Study Platform</h1>
-        <p>Access notes, links, videos, images, and audio securely from the cloud.</p>
+    <!-- Top Announcement Bar -->
+    <div class="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-xs sm:text-sm py-2 px-4 text-center font-medium shadow-sm flex items-center justify-center gap-2 flex-wrap">
+        <span>🚀 Welcome to <strong>MAALIM-KENYA EDUCATION HUB</strong> | Math, Computer Studies & Tech Excellence</span>
+        <span class="bg-white/20 px-2 py-0.5 rounded-full text-xs font-semibold">Admin: Daniel Chiro Bandari</span>
+        <a href="https://wa.me/254113696442" target="_blank" class="underline hover:text-blue-200 flex items-center gap-1 font-semibold">
+            <i data-lucide="message-circle" class="w-3.5 h-3.5 inline"></i> WhatsApp: +254113696442
+        </a>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-50 glass border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchTab('home')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-blue-500/30">
+                    MK
+                </div>
+                <div>
+                    <h1 class="font-extrabold text-base sm:text-lg tracking-tight gradient-text">MAALIM-KENYA HUB</h1>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium tracking-wide">Math • Computer • Tech</p>
+                </div>
+            </div>
+
+            <!-- Desktop Nav Links -->
+            <nav class="hidden md:flex items-center space-x-1">
+                <button onclick="switchTab('home')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all hover:bg-slate-200/60 dark:hover:bg-slate-800/60 text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50" data-target="home">Home</button>
+                <button onclick="switchTab('resources')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all hover:bg-slate-200/60 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-300" data-target="resources">Resources Hub</button>
+                <button onclick="switchTab('quizzes')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all hover:bg-slate-200/60 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-300 flex items-center gap-1.5" data-target="quizzes">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-badge"></span> Quizzes & Games
+                </button>
+                <button onclick="switchTab('submissions')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all hover:bg-slate-200/60 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-300" data-target="submissions">Student Uploads</button>
+                <button onclick="switchTab('admin')" class="nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-md shadow-orange-500/20 hover:opacity-90 flex items-center gap-1.5" data-target="admin">
+                    <i data-lucide="shield-check" class="w-4 h-4"></i> Admin Portal
+                </button>
+            </nav>
+
+            <!-- Mobile Menu Button -->
+            <div class="flex items-center gap-2 md:hidden">
+                <button onclick="switchTab('admin')" class="px-2.5 py-1.5 rounded-lg text-xs font-medium bg-amber-500 text-white flex items-center gap-1">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i> Admin
+                </button>
+                <button id="mobile-menu-btn" class="p-2 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-800">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Dropdown Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-4 pt-2 pb-4 space-y-1 glass border-t border-slate-200 dark:border-slate-800">
+            <button onclick="switchTab('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800">Home</button>
+            <button onclick="switchTab('resources'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800">Resources Hub</button>
+            <button onclick="switchTab('quizzes'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800">Quizzes & Games</button>
+            <button onclick="switchTab('submissions'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-800">Student Uploads</button>
+        </div>
     </header>
 
-    <div class="container">
-        <!-- Top Status Bar -->
-        <div class="nav-buttons">
-            <span id="currentUserDisplay" style="font-weight: bold; color: var(--primary);">Status: Not Logged In</span>
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ==================== TAB 1: HOME ==================== -->
+        <section id="tab-home" class="tab-content space-y-12">
+            <!-- Hero Banner -->
+            <div class="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-900 via-indigo-950 to-slate-900 text-white p-8 sm:p-12 shadow-2xl border border-blue-800/40">
+                <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="absolute -left-20 -top-20 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+                <div class="relative z-10 max-w-2xl space-y-6">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/30 text-blue-200 border border-blue-400/30">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5"></i> Modern E-Learning Platform in Kenya
+                    </span>
+                    <h1 class="text-4xl sm:text-6xl font-black tracking-tight leading-none">
+                        Master <span class="gradient-text bg-gradient-to-r from-blue-400 via-teal-300 to-indigo-300">Math, Computer & Tech</span>
+                    </h1>
+                    <p class="text-slate-300 text-base sm:text-lg leading-relaxed">
+                        Welcome to Maalim-Kenya Education Hub! Access curated multimedia notes, interactive coding challenges, advanced quizzes with instant feedback, and practical technical resources tailored for Kenyan students.
+                    </p>
+                    <div class="flex flex-wrap gap-4 pt-2">
+                        <button onclick="switchTab('resources')" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold shadow-lg shadow-blue-600/30 transition-all flex items-center gap-2">
+                            Explore Resources <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                        </button>
+                        <button onclick="switchTab('quizzes')" class="px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold backdrop-blur border border-white/20 transition-all flex items-center gap-2">
+                            Play Quizzes & Games <i data-lucide="gamepad-2" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Creator Spotlight (Dynamic Profile) -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+                <div class="lg:col-span-1 glass rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col items-center text-center justify-between border border-slate-200 dark:border-slate-800">
+                    <div class="space-y-4 w-full">
+                        <div class="relative w-32 h-32 mx-auto rounded-2xl overflow-hidden shadow-xl border-4 border-blue-500/30 group">
+                            <img id="display-admin-photo" src="https://placehold.co/400x400/2563eb/ffffff?text=Daniel+Bandari" alt="Admin Daniel Chiro Bandari" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onerror="this.src='https://placehold.co/400x400/2563eb/ffffff?text=Daniel+Bandari'">
+                            <div class="absolute bottom-1 right-1 bg-emerald-500 w-4 h-4 rounded-full border-2 border-white" title="Admin Online"></div>
+                        </div>
+                        <div>
+                            <h3 id="display-admin-name" class="text-xl font-bold">Daniel Chiro Bandari</h3>
+                            <p class="text-xs text-blue-600 dark:text-blue-400 font-semibold uppercase tracking-wider mt-1">Founder & Lead Educator</p>
+                        </div>
+                        <p id="display-admin-bio" class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                            Passionate educator empowering Kenyan learners in Mathematics, Computer Science, and cutting-edge Technology. Dedicated to digital inclusion and interactive pedagogy.
+                        </p>
+                    </div>
+                    <div class="w-full pt-6 mt-6 border-t border-slate-200 dark:border-slate-800 space-y-3">
+                        <a href="mailto:daniebandari@gmail.com" class="flex items-center justify-center gap-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+                            <i data-lucide="mail" class="w-4 h-4 text-blue-600"></i> daniebandari@gmail.com
+                        </a>
+                        <a href="https://wa.me/254113696442" target="_blank" class="flex items-center justify-center gap-2 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:underline">
+                            <i data-lucide="message-circle" class="w-4 h-4"></i> +254 113 696 442 (WhatsApp / Tel)
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Category Highlights -->
+                <div class="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
+                    <div class="glass rounded-3xl p-6 shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:border-blue-500/50 transition-all group cursor-pointer" onclick="filterResources('Mathematics')">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-blue-500/10 text-blue-600 dark:text-blue-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="calculator" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-lg font-bold">Mathematics</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">Trigonometry, Calculus, Algebra, Vectors & Matrices with step-by-step problem solvers.</p>
+                        </div>
+                        <span class="text-xs font-semibold text-blue-600 dark:text-blue-400 flex items-center gap-1 mt-4">
+                            Explore Math Notes <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </div>
+
+                    <div class="glass rounded-3xl p-6 shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:border-purple-500/50 transition-all group cursor-pointer" onclick="filterResources('Computer Studies')">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-purple-500/10 text-purple-600 dark:text-purple-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="cpu" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-lg font-bold">Computer Studies</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">Hardware architecture, Von Neumann model, Networking, Databases, and C++ programming.</p>
+                        </div>
+                        <span class="text-xs font-semibold text-purple-600 dark:text-purple-400 flex items-center gap-1 mt-4">
+                            Explore Computer Notes <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </div>
+
+                    <div class="glass rounded-3xl p-6 shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:border-emerald-500/50 transition-all group cursor-pointer" onclick="filterResources('Tech & Innovation')">
+                        <div class="space-y-3">
+                            <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <i data-lucide="globe" class="w-6 h-6"></i>
+                            </div>
+                            <h3 class="text-lg font-bold">Tech & Innovation</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400">AI fundamentals, Web Development, M-Pesa API integration, and modern software engineering.</p>
+                        </div>
+                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-4">
+                            Explore Tech Notes <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 2: RESOURCES HUB ==================== -->
+        <section id="tab-resources" class="tab-content hidden space-y-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-6 rounded-3xl shadow-xl border border-slate-200 dark:border-slate-800">
+                <div>
+                    <h2 class="text-2xl font-black">Multimedia Resources & Study Hub</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Browse video tutorials, PDF notes, and reference links uploaded by Admin Daniel.</p>
+                </div>
+                <div class="flex items-center gap-2 flex-wrap">
+                    <button onclick="filterResources('All')" class="res-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-md">All</button>
+                    <button onclick="filterResources('Mathematics')" class="res-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Mathematics</button>
+                    <button onclick="filterResources('Computer Studies')" class="res-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Computer Studies</button>
+                    <button onclick="filterResources('Tech & Innovation')" class="res-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300">Tech</button>
+                </div>
+            </div>
+
+            <!-- Resources Grid -->
+            <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Dynamically populated via Firebase or fallback -->
+                <div class="glass rounded-3xl p-6 shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400">Mathematics</span>
+                            <span class="text-xs text-slate-400">PDF Note</span>
+                        </div>
+                        <h3 class="text-lg font-bold">Advanced Calculus & Integration Masterclass</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">Comprehensive guide covering definite integrals, integration by parts, and real-world engineering applications.</p>
+                    </div>
+                    <div class="pt-6 mt-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                        <span class="text-xs text-slate-500">By Daniel Bandari</span>
+                        <a href="#" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow">
+                            <i data-lucide="download" class="w-3.5 h-3.5"></i> Access File
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 3: QUIZZES & GAMES ==================== -->
+        <section id="tab-quizzes" class="tab-content hidden space-y-8">
+            <div class="bg-gradient-to-r from-purple-900 to-indigo-900 text-white rounded-3xl p-8 shadow-xl flex flex-col sm:flex-row justify-between items-center gap-6">
+                <div class="space-y-2">
+                    <span class="px-3 py-1 rounded-full text-xs font-semibold bg-purple-500/30 text-purple-200 border border-purple-400/30">Interactive Zone</span>
+                    <h2 class="text-3xl font-black">Quizzes, Coding & Logic Games</h2>
+                    <p class="text-purple-200 text-sm">Test your knowledge across Math and Computer Studies with immediate feedback, live timers, and celebratory rewards!</p>
+                </div>
+                <div class="flex gap-3">
+                    <button onclick="startQuiz('math')" class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 font-semibold text-white shadow-lg flex items-center gap-2">
+                        <i data-lucide="calculator" class="w-4 h-4"></i> Math Quiz
+                    </button>
+                    <button onclick="startQuiz('computer')" class="px-5 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-semibold text-white shadow-lg flex items-center gap-2">
+                        <i data-lucide="cpu" class="w-4 h-4"></i> Computer Quiz
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quiz Arena Card -->
+            <div id="quiz-container" class="glass rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800 max-w-3xl mx-auto">
+                <div class="text-center py-12 space-y-6">
+                    <div class="w-20 h-20 rounded-3xl bg-gradient-to-tr from-blue-600 to-purple-600 text-white mx-auto flex items-center justify-center shadow-xl shadow-purple-500/30">
+                        <i data-lucide="award" class="w-10 h-10"></i>
+                    </div>
+                    <div class="space-y-2">
+                        <h3 class="text-2xl font-bold">Ready to test your skills?</h3>
+                        <p class="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">Select either the Mathematics or Computer Studies challenge above to start your timed quiz with instant scoring and confetti!</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 4: STUDENT SUBMISSIONS / UPLOADS ==================== -->
+        <section id="tab-submissions" class="tab-content hidden space-y-8">
+            <div class="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl border border-slate-200 dark:border-slate-800 max-w-2xl mx-auto space-y-6">
+                <div>
+                    <h2 class="text-2xl font-black">Student Assignment & Project Upload</h2>
+                    <p class="text-sm text-slate-500 dark:text-slate-400">Submit your homework, coding projects, or questions directly to Admin Daniel Bandari.</p>
+                </div>
+
+                <form id="submission-form" onsubmit="handleStudentUpload(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Your Full Name</label>
+                        <input type="text" id="sub-name" required placeholder="e.g. Amina Mohammed" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Category / Subject</label>
+                        <select id="sub-category" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                            <option value="Mathematics">Mathematics Assignment</option>
+                            <option value="Computer Studies">Computer Studies Project</option>
+                            <option value="Tech & Innovation">Tech & Innovation Hub</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Project / File Link (Drive, GitHub, or URL)</label>
+                        <input type="url" id="sub-link" required placeholder="https://github.com/my-project or Google Drive link" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 text-slate-600 dark:text-slate-400">Short Description / Notes</label>
+                        <textarea id="sub-desc" rows="3" placeholder="Describe your submission..." class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"></textarea>
+                    </div>
+                    <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold shadow-lg shadow-blue-500/30 hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="upload-cloud" class="w-5 h-5"></i> Submit to Admin
+                    </button>
+                </form>
+            </div>
+
+            <!-- Recent Submissions List -->
+            <div class="max-w-4xl mx-auto space-y-4">
+                <h3 class="text-xl font-bold">Recent Student Submissions</h3>
+                <div id="submissions-list" class="space-y-3">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== TAB 5: ADMIN PORTAL ==================== -->
+        <section id="tab-admin" class="tab-content hidden space-y-8">
+            <div id="admin-login-wrapper" class="max-w-md mx-auto glass rounded-3xl p-8 shadow-2xl border border-slate-200 dark:border-slate-800 space-y-6">
+                <div class="text-center space-y-2">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-500 text-white mx-auto flex items-center justify-center shadow-lg shadow-amber-500/30">
+                        <i data-lucide="shield-check" class="w-8 h-8"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold">Admin Authentication</h2>
+                    <p class="text-xs text-slate-500">Authorized for Daniel Chiro Bandari (daniebandari@gmail.com)</p>
+                </div>
+                <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1">Admin Email</label>
+                        <input type="email" id="admin-email-input" value="daniebandari@gmail.com" required class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1">Security PIN / Password</label>
+                        <input type="password" id="admin-pass-input" placeholder="Enter PIN (default: 254113)" required class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <button type="submit" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 text-white font-bold shadow-lg shadow-orange-500/30 hover:opacity-90 transition-all flex items-center justify-center gap-2">
+                        <i data-lucide="log-in" class="w-5 h-5"></i> Access Admin Dashboard
+                    </button>
+                </form>
+            </div>
+
+            <!-- Admin Dashboard (Hidden until login) -->
+            <div id="admin-dashboard-wrapper" class="hidden space-y-8">
+                <div class="bg-gradient-to-r from-amber-600 to-orange-600 text-white rounded-3xl p-8 shadow-xl flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div class="space-y-1">
+                        <span class="bg-white/20 px-3 py-1 rounded-full text-xs font-semibold">Welcome Back, Daniel</span>
+                        <h2 class="text-3xl font-black">Admin Management Suite</h2>
+                        <p class="text-amber-100 text-sm">Upload multimedia files, manage study notes, update your profile picture & bio, and review student uploads.</p>
+                    </div>
+                    <button onclick="handleAdminLogout()" class="px-4 py-2.5 rounded-xl bg-white/20 hover:bg-white/30 text-white font-semibold text-xs backdrop-blur border border-white/30">
+                        Logout Admin
+                    </button>
+                </div>
+
+                <!-- Admin Tabs Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Add Resource Form -->
+                    <div class="glass rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 dark:border-slate-800 space-y-6">
+                        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+                            <div class="p-2.5 rounded-xl bg-blue-500/10 text-blue-600"><i data-lucide="plus-circle" class="w-6 h-6"></i></div>
+                            <div>
+                                <h3 class="text-lg font-bold">Add New Multimedia Resource</h3>
+                                <p class="text-xs text-slate-500">Publish notes, video tutorials, or code links for students.</p>
+                            </div>
+                        </div>
+                        <form onsubmit="handleAddResource(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider mb-1">Resource Title</label>
+                                <input type="text" id="res-title" required placeholder="e.g. Python Programming Basics" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider mb-1">Category</label>
+                                <select id="res-cat" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm">
+                                    <option value="Mathematics">Mathematics</option>
+                                    <option value="Computer Studies">Computer Studies</option>
+                                    <option value="Tech & Innovation">Tech & Innovation</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider mb-1">Resource Type</label>
+                                <select id="res-type" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm">
+                                    <option value="PDF Note">PDF Document / Note</option>
+                                    <option value="Video Link">Video Tutorial (YouTube/MP4)</option>
+                                    <option value="Code Snippet">Interactive Code Snippet</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider mb-1">File or Link URL</label>
+                                <input type="url" id="res-url" required placeholder="https://example.com/file.pdf" class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider mb-1">Description</label>
+                                <textarea id="res-desc" rows="2" placeholder="Brief summary..." class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm"></textarea>
+                            </div>
+                            <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-sm shadow-md">
+                                Publish Resource
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Update Admin Profile Form -->
+                    <div class="glass rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 dark:border-slate-800 space-y-6">
+                        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+                            <div class="p-2.5 rounded-xl bg-amber-500/10 text-amber-600"><i data-lucide="user-cog" class="w-6 h-6"></i></div>
+                            <div>
+                                <h3 class="text-lg font-bold">Update Admin Profile</h3>
+                                <p class="text-xs text-slate-500">Change your photo, bio, and contact info visible to students.</p>
+                            </div>
+                        </div>
+                        <form onsubmit="handleUpdateProfile(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider mb-1">Admin Full Name</label>
+                                <input type="text" id="prof-name" value="Daniel Chiro Bandari" required class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider mb-1">Photo Image URL</label>
+                                <input type="url" id="prof-photo" placeholder="https://..." required class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm" value="https://placehold.co/400x400/2563eb/ffffff?text=Daniel+Bandari">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold uppercase tracking-wider mb-1">Bio / About</label>
+                                <textarea id="prof-bio" rows="3" required class="w-full px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-sm">Passionate educator empowering Kenyan learners in Mathematics, Computer Science, and cutting-edge Technology.</textarea>
+                            </div>
+                            <button type="submit" class="w-full py-3 rounded-xl bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm shadow-md">
+                                Save Profile Changes
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Manage Existing Resources -->
+                <div class="glass rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-200 dark:border-slate-800 space-y-6">
+                    <h3 class="text-xl font-bold">Manage Published Resources</h3>
+                    <div id="admin-resources-table" class="overflow-x-auto">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 border-t border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 backdrop-blur py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
             <div>
-                <button id="navUserBtn" onclick="switchPanel('userPanel')" style="display:none;">User Dashboard</button>
-                <button id="navAdminBtn" onclick="switchPanel('adminPanel')" style="display:none;">Admin Dashboard</button>
-                <button class="danger" id="logoutBtn" onclick="logout()" style="display:none;">Log Out</button>
+                &copy; 2026 <strong>MAALIM-KENYA EDUCATION HUB</strong>. Created by Daniel Chiro Bandari.
+            </div>
+            <div class="flex items-center gap-4">
+                <a href="mailto:daniebandari@gmail.com" class="hover:underline">daniebandari@gmail.com</a>
+                <span>•</span>
+                <a href="https://wa.me/254113696442" target="_blank" class="hover:underline text-emerald-600 font-semibold">+254113696442</a>
             </div>
         </div>
+    </footer>
 
-        <!-- AUTH PANEL (Login / Register) -->
-        <div id="authPanel" class="panel active">
-            <h2>Welcome! Please Log In or Create an Account</h2>
-            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
-                
-                <!-- Login Box -->
-                <div class="auth-card" style="flex: 1; min-width: 280px;">
-                    <h3>User / Admin Log In</h3>
-                    <input type="text" id="loginUser" placeholder="Username">
-                    <div class="password-container">
-                        <input type="password" id="loginPass" placeholder="Password">
-                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('loginPass', this)">👁️</button>
+    <!-- Firebase SDK Imports & App Logic -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, doc, setDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'maalim-kenya-hub-default';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+
+        let db, auth, currentUser = null;
+        let resourcesData = [];
+        let submissionsData = [];
+
+        // Initialize Firebase safely
+        try {
+            if (Object.keys(firebaseConfig).length > 0) {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+                signInAnonymously(auth).then(res => {
+                    currentUser = res.user;
+                    initRealtimeListeners();
+                }).catch(err => console.error("Auth error:", err));
+            } else {
+                // Fallback mock mode for local testing / GitHub Pages preview without config
+                console.warn("Running in local mock mode without Firebase config.");
+                loadMockData();
+            }
+        } catch (e) {
+            console.error("Firebase init failed:", e);
+            loadMockData();
+        }
+
+        function loadMockData() {
+            resourcesData = [
+                { id: '1', title: 'Advanced Calculus & Integration Masterclass', category: 'Mathematics', type: 'PDF Note', url: '#', description: 'Comprehensive guide covering definite integrals and real-world applications.' },
+                { id: '2', title: 'Von Neumann Architecture & CPU Execution', category: 'Computer Studies', type: 'Video Link', url: 'https://youtube.com', description: 'Detailed breakdown of fetch-decode-execute cycle.' },
+                { id: '3', title: 'M-Pesa API Daraja Integration Guide', category: 'Tech & Innovation', type: 'Code Snippet', url: 'https://github.com', description: 'Learn how to integrate Lipa na M-Pesa STK push in modern web apps.' }
+            ];
+            submissionsData = [
+                { id: '1', name: 'Amina Mohammed', category: 'Mathematics', link: 'https://github.com', desc: 'Completed trigonometry problem set #4', date: '2026-03-30' }
+            ];
+            renderResources(resourcesData);
+            renderSubmissions(submissionsData);
+            renderAdminResourcesTable(resourcesData);
+        }
+
+        function initRealtimeListeners() {
+            if (!db) return;
+            // Resources Listener
+            const resCol = collection(db, 'artifacts', appId, 'public', 'data', 'resources');
+            onSnapshot(resCol, (snapshot) => {
+                resourcesData = [];
+                snapshot.forEach(docSnap => {
+                    resourcesData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                if (resourcesData.length === 0) loadMockData();
+                else {
+                    renderResources(resourcesData);
+                    renderAdminResourcesTable(resourcesData);
+                }
+            }, (error) => { console.error("Res snapshot error:", error); loadMockData(); });
+
+            // Submissions Listener
+            const subCol = collection(db, 'artifacts', appId, 'public', 'data', 'submissions');
+            onSnapshot(subCol, (snapshot) => {
+                submissionsData = [];
+                snapshot.forEach(docSnap => {
+                    submissionsData.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                renderSubmissions(submissionsData);
+            }, (error) => { console.error("Sub snapshot error:", error); });
+
+            // Admin Profile Listener
+            const profDoc = doc(db, 'artifacts', appId, 'public', 'data', 'adminProfile', 'profile');
+            onSnapshot(profDoc, (docSnap) => {
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    document.getElementById('display-admin-name').innerText = data.name || 'Daniel Chiro Bandari';
+                    document.getElementById('display-admin-bio').innerText = data.bio || '';
+                    document.getElementById('display-admin-photo').src = data.photo || '';
+                    document.getElementById('prof-name').value = data.name || 'Daniel Chiro Bandari';
+                    document.getElementById('prof-bio').value = data.bio || '';
+                    document.getElementById('prof-photo').value = data.photo || '';
+                }
+            }, (error) => { console.error("Profile snapshot error:", error); });
+        }
+
+        // Render Functions
+        window.renderResources = function(data) {
+            const grid = document.getElementById('resources-grid');
+            if (!grid) return;
+            grid.innerHTML = data.map(item => `
+                <div class="glass rounded-3xl p-6 shadow-xl border border-slate-200 dark:border-slate-800 flex flex-col justify-between hover:border-blue-500/40 transition-all">
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-start">
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-600 dark:text-blue-400">${item.category}</span>
+                            <span class="text-xs text-slate-400 font-medium">${item.type}</span>
+                        </div>
+                        <h3 class="text-lg font-bold">${item.title}</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">${item.description || ''}</p>
                     </div>
-                    <button class="success" onclick="login()">Log In</button>
-                </div>
-
-                <!-- Registration Box -->
-                <div class="auth-card" style="flex: 1; min-width: 280px;">
-                    <h3>Create End User Account</h3>
-                    <input type="text" id="regUser" placeholder="Choose Username">
-                    <div class="password-container">
-                        <input type="password" id="regPass" placeholder="Choose Password">
-                        <button type="button" class="toggle-password" onclick="togglePasswordVisibility('regPass', this)">👁️</button>
+                    <div class="pt-6 mt-6 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
+                        <span class="text-xs text-slate-500">By Daniel Bandari</span>
+                        <a href="${item.url}" target="_blank" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold flex items-center gap-1.5 shadow">
+                            <i data-lucide="external-link" class="w-3.5 h-3.5"></i> Open Resource
+                        </a>
                     </div>
-                    <button onclick="registerUser()">Register Account</button>
                 </div>
+            `).join('');
+            lucide.createIcons();
+        }
 
-            </div>
-        </div>
+        window.renderSubmissions = function(data) {
+            const list = document.getElementById('submissions-list');
+            if (!list) return;
+            if (data.length === 0) {
+                list.innerHTML = `<p class="text-sm text-slate-500 text-center py-4">No student submissions yet.</p>`;
+                return;
+            }
+            list.innerHTML = data.map(sub => `
+                <div class="glass p-4 rounded-2xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border border-slate-200 dark:border-slate-800">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-sm">${sub.name}</h4>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-indigo-500/10 text-indigo-600">${sub.category}</span>
+                        </div>
+                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">${sub.desc || 'No description'}</p>
+                    </div>
+                    <a href="${sub.link}" target="_blank" class="px-3.5 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-semibold flex items-center gap-1">
+                        <i data-lucide="link" class="w-3.5 h-3.5"></i> View Project
+                    </a>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
 
-        <!-- END USER PANEL -->
-        <div id="userPanel" class="panel">
-            <h2>End User Dashboard</h2>
-            <p>Welcome, <span id="welcomeName"></span>! You can open, read, and view all cloud-synced items below. Downloads remain locked until approved by the admin.</p>
+        window.renderAdminResourcesTable = function(data) {
+            const container = document.getElementById('admin-resources-table');
+            if (!container) return;
+            container.innerHTML = `
+                <table class="w-full text-left text-sm">
+                    <thead>
+                        <tr class="border-b border-slate-200 dark:border-slate-800 text-xs uppercase text-slate-400">
+                            <th class="pb-3">Title</th>
+                            <th class="pb-3">Category</th>
+                            <th class="pb-3">Type</th>
+                            <th class="pb-3 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-200 dark:divide-slate-800">
+                        ${data.map(item => `
+                            <tr>
+                                <td class="py-3 font-semibold">${item.title}</td>
+                                <td class="py-3 text-slate-500">${item.category}</td>
+                                <td class="py-3 text-slate-500">${item.type}</td>
+                                <td class="py-3 text-right">
+                                    <button onclick="deleteResource('${item.id}')" class="px-3 py-1 bg-red-500/10 text-red-600 hover:bg-red-500 hover:text-white rounded-lg text-xs font-semibold transition-colors">
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            lucide.createIcons();
+        }
 
-            <h3>Available Uploads & Resources</h3>
-            <table id="userFilesTable">
-                <tr>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Uploaded By</th>
-                    <th>Open & Read</th>
-                    <th>Download Status</th>
-                </tr>
-            </table>
-
-            <!-- Contact Info Section with WhatsApp Integration -->
-            <div class="contact-box">
-                <h3>Contact Admin</h3>
-                <p>If you need download permissions or have questions, reach out directly:</p>
-                <p><strong>Email:</strong> danielbandari@gmail.com</p>
-                <p><strong>Tel:</strong> 0113696442</p>
-                
-                <!-- WhatsApp Direct Chat Button -->
-                <a href="https://wa.me/254113696442?text=Hello%20Maalim,%20I%20need%20assistance%20with%20the%20Study%20Platform." target="_blank" class="whatsapp-btn">
-                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                    Chat with Admin on WhatsApp
-                </a>
-            </div>
-        </div>
-
-        <!-- ADMIN PANEL -->
-        <div id="adminPanel" class="panel">
-            <h2>Admin Dashboard (maalim003)</h2>
-            <p>Cloud Control Panel: Upload items up to 30MB, manage permissions, and inspect registered cloud users.</p>
-
-            <div class="auth-card">
-                <h3>Upload New Resource to Cloud (Limit: 30MB)</h3>
-                <input type="text" id="uploadTitle" placeholder="Resource Title or Link URL">
-                <select id="uploadType">
-                    <option value="Note">Note / Document / PDF</option>
-                    <option value="Image">Image</option>
-                    <option value="Video">Video</option>
-                    <option value="Audio">Audio</option>
-                    <option value="Link">Web Link / App Link</option>
-                </select>
-                <textarea id="uploadTextContent" placeholder="Paste Note/Document text content or description here" rows="4"></textarea>
-                <input type="file" id="uploadFile">
-                <button onclick="adminUpload()">Upload to Cloud</button>
-            </div>
-
-            <h3>Manage Uploads & Permissions</h3>
-            <table id="adminFilesTable">
-                <tr>
-                    <th>Title</th>
-                    <th>Type</th>
-                    <th>Open & Read</th>
-                    <th>Download Permission</th>
-                    <th>Actions</th>
-                </tr>
-            </table>
-
-            <h3>Registered Accounts & Visit Log</h3>
-            <p><strong>Total Site Visits:</strong> <span id="visitCount">1</span></p>
-            <ul id="accountList"></ul>
-        </div>
-    </div>
-
-    <!-- MEDIA VIEWER MODAL -->
-    <div id="mediaModal">
-        <div class="modal-content">
-            <button class="danger" onclick="closeModal()" style="float: right; padding: 5px 10px;">Close X</button>
-            <h3 id="modalTitle" style="margin-top: 10px;">Resource Viewer</h3>
-            <div id="modalBody" style="margin-top: 15px; text-align: center;"></div>
-        </div>
-    </div>
-
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyB77IErJJH-Y4sixxLFFEnuO21q6HjIp7w",
-            authDomain: "maalim-946b5.firebaseapp.com",
-            projectId: "maalim-946b5",
-            storageBucket: "maalim-946b5.firebasestorage.app",
-            messagingSenderId: "485463178885",
-            appId: "1:485463178885:web:714542425d3f2ffff2b3ec",
-            measurementId: "G-5X05PKDGCR"
+        // Filter Resources
+        window.filterResources = function(category) {
+            switchTab('resources');
+            const btns = document.querySelectorAll('.res-filter-btn');
+            btns.forEach(b => {
+                if (b.innerText === category || (category === 'All' && b.innerText === 'All')) {
+                    b.className = "res-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-blue-600 text-white shadow-md";
+                } else {
+                    b.className = "res-filter-btn px-4 py-2 rounded-xl text-xs font-semibold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300";
+                }
+            });
+            if (category === 'All') {
+                renderResources(resourcesData);
+            } else {
+                const filtered = resourcesData.filter(r => r.category === category);
+                renderResources(filtered);
+            }
         };
 
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const storage = firebase.storage();
-
-        let resources = [];
-        let users = { "student1": "password123" };
-        let activeSession = JSON.parse(localStorage.getItem('active_session')) || null;
-
-        // Track Visits
-        let visits = localStorage.getItem('site_visits') || 1;
-        if(!sessionStorage.getItem('visited')) {
-            visits++;
-            localStorage.setItem('site_visits', visits);
-            sessionStorage.setItem('visited', 'true');
-        }
-        document.getElementById('visitCount').innerText = visits;
-
-        // Fetch Real-time Cloud Data from Firebase Firestore
-        function initCloudSync() {
-            db.collection("resources").onSnapshot((snapshot) => {
-                resources = [];
-                snapshot.forEach((doc) => {
-                    resources.push({ id: doc.id, ...doc.data() });
-                });
-                renderLists();
-            }, (error) => {
-                console.log("Firestore error, falling back to local storage:", error);
-                resources = JSON.parse(localStorage.getItem('site_resources')) || [];
-                renderLists();
-            });
-
-            db.collection("users").doc("accounts").onSnapshot((doc) => {
-                if (doc.exists) {
-                    users = doc.data();
-                }
-                renderLists();
-            }, (error) => {
-                users = JSON.parse(localStorage.getItem('site_users')) || { "student1": "password123" };
-                renderLists();
-            });
-        }
-
-        initCloudSync();
-        checkSession();
-
-        function togglePasswordVisibility(fieldId, btn) {
-            let passwordInput = document.getElementById(fieldId);
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                btn.textContent = "🙈";
+        // Admin Actions
+        window.handleAdminLogin = function(e) {
+            e.preventDefault();
+            const pass = document.getElementById('admin-pass-input').value;
+            if (pass === '254113' || pass === 'admin123') {
+                document.getElementById('admin-login-wrapper').classList.add('hidden');
+                document.getElementById('admin-dashboard-wrapper').classList.remove('hidden');
             } else {
-                passwordInput.type = "password";
-                btn.textContent = "👁";
+                alert('Invalid security PIN. Hint: Use 254113 or admin123');
             }
-        }
+        };
 
-        function switchPanel(panelId) {
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            let target = document.getElementById(panelId);
-            if(target) {
-                target.classList.add('active');
-            }
-        }
+        window.handleAdminLogout = function() {
+            document.getElementById('admin-dashboard-wrapper').classList.add('hidden');
+            document.getElementById('admin-login-wrapper').classList.remove('hidden');
+        };
 
-        function registerUser() {
-            let u = document.getElementById('regUser').value.trim();
-            let p = document.getElementById('regPass').value.trim();
+        window.handleAddResource = async function(e) {
+            e.preventDefault();
+            const newRes = {
+                title: document.getElementById('res-title').value,
+                category: document.getElementById('res-cat').value,
+                type: document.getElementById('res-type').value,
+                url: document.getElementById('res-url').value,
+                description: document.getElementById('res-desc').value,
+                createdAt: new Date().toISOString()
+            };
 
-            if(!u || !p) {
-                alert("Please fill in both username and password.");
-                return;
-            }
-            if(users[u] || u === "maalim003") {
-                alert("Username already exists. Choose another.");
-                return;
-            }
-
-            users[u] = p;
-            db.collection("users").doc("accounts").set(users).then(() => {
-                alert("Account registered to cloud successfully!");
-                document.getElementById('regUser').value = '';
-                document.getElementById('regPass').value = '';
-                renderLists();
-            }).catch(err => {
-                alert("Error registering user: " + err.message);
-            });
-        }
-
-        function login() {
-            let u = document.getElementById('loginUser').value.trim();
-            let p = document.getElementById('loginPass').value.trim();
-
-            if(u === "maalim003" && p === "14415") {
-                activeSession = { username: "maalim003", role: "admin" };
-                localStorage.setItem('active_session', JSON.stringify(activeSession));
-                alert("Welcome back, Admin!");
-                checkSession();
-                return;
-            }
-
-            if(users[u] && users[u] === p) {
-                activeSession = { username: u, role: "user" };
-                localStorage.setItem('active_session', JSON.stringify(activeSession));
-                alert("Login successful!");
-                checkSession();
-                return;
-            }
-
-            alert("Invalid username or password.");
-        }
-
-        function logout() {
-            activeSession = null;
-            localStorage.removeItem('active_session');
-            checkSession();
-        }
-
-        function checkSession() {
-            let statusDisplay = document.getElementById('currentUserDisplay');
-            let navUserBtn = document.getElementById('navUserBtn');
-            let navAdminBtn = document.getElementById('navAdminBtn');
-            let logoutBtn = document.getElementById('logoutBtn');
-
-            if(activeSession) {
-                logoutBtn.style.display = "inline-block";
-                if(activeSession.role === "admin") {
-                    statusDisplay.innerText = "Logged in as: Admin (maalim003)";
-                    navUserBtn.style.display = "inline-block";
-                    navAdminBtn.style.display = "inline-block";
-                    switchPanel('adminPanel');
-                } else {
-                    statusDisplay.innerText = "Logged in as: " + activeSession.username;
-                    let welcomeEl = document.getElementById('welcomeName');
-                    if(welcomeEl) welcomeEl.innerText = activeSession.username;
-                    navUserBtn.style.display = "inline-block";
-                    navAdminBtn.style.display = "none";
-                    switchPanel('userPanel');
+            if (db && currentUser) {
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'resources'), newRes);
+                    alert('Resource published successfully!');
+                    e.target.reset();
+                } catch (err) {
+                    console.error("Error adding resource:", err);
                 }
             } else {
-                statusDisplay.innerText = "Status: Not Logged In";
-                navUserBtn.style.display = "none";
-                navAdminBtn.style.display = "none";
-                logoutBtn.style.display = "none";
-                switchPanel('authPanel');
+                resourcesData.push({ id: Date.now().toString(), ...newRes });
+                renderResources(resourcesData);
+                renderAdminResourcesTable(resourcesData);
+                alert('Resource published locally!');
+                e.target.reset();
             }
-            renderLists();
-        }
+        };
 
-        function openResource(index) {
-            let res = resources[index];
-            let targetUrl = res.url || res.title;
-            let lowerUrl = targetUrl.toLowerCase();
-
-            // Handle App Links, Web Links, and external URLs (YouTube, Facebook, WhatsApp, Chrome/Websites)
-            if (
-                res.type === "Link" || 
-                lowerUrl.includes("youtube.com") || 
-                lowerUrl.includes("youtu.be") || 
-                lowerUrl.includes("facebook.com") || 
-                lowerUrl.includes("fb.com") || 
-                lowerUrl.includes("wa.me") || 
-                lowerUrl.includes("whatsapp.com") || 
-                lowerUrl.startsWith("http://") || 
-                lowerUrl.startsWith("https://")
-            ) {
-                window.open(targetUrl, '_blank');
-                return;
-            }
-
-            let modal = document.getElementById('mediaModal');
-            let modalTitle = document.getElementById('modalTitle');
-            let modalBody = document.getElementById('modalBody');
-
-            modalTitle.innerText = res.title + " (" + res.type + ")";
-            modalBody.innerHTML = "";
-
-            if (res.type === "Image") {
-                let img = document.createElement('img');
-                img.src = targetUrl;
-                modalBody.appendChild(img);
-            } else if (res.type === "Video") {
-                let video = document.createElement('video');
-                video.src = targetUrl;
-                video.controls = true;
-                video.autoplay = true;
-                modalBody.appendChild(video);
-            } else if (res.type === "Audio") {
-                let audio = document.createElement('audio');
-                audio.src = targetUrl;
-                audio.controls = true;
-                audio.autoplay = true;
-                modalBody.appendChild(audio);
+        window.deleteResource = async function(id) {
+            if (!confirm('Are you sure you want to delete this resource?')) return;
+            if (db && currentUser) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'resources', id));
+                } catch (err) {
+                    console.error("Error deleting:", err);
+                }
             } else {
-                let textDiv = document.createElement('div');
-                textDiv.style.textAlign = "left";
-                textDiv.style.padding = "15px";
-                textDiv.style.background = "#f9f9f9";
-                textDiv.style.border = "1px solid #ddd";
-                textDiv.style.borderRadius = "4px";
-                
-                let displayContent = res.contentText || targetUrl || "No text content available.";
-                textDiv.innerHTML = `<h4>Document / Note Content:</h4><p style="white-space: pre-wrap; line-height: 1.5;">${displayContent}</p>`;
-                modalBody.appendChild(textDiv);
+                resourcesData = resourcesData.filter(r => r.id !== id);
+                renderResources(resourcesData);
+                renderAdminResourcesTable(resourcesData);
             }
+        };
 
-            modal.style.display = "flex";
-        }
-
-        function closeModal() {
-            document.getElementById('mediaModal').style.display = "none";
-            document.getElementById('modalBody').innerHTML = "";
-        }
-
-        function renderLists() {
-            let userTable = document.getElementById('userFilesTable');
-            if(userTable) {
-                userTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Uploaded By</th><th>Open & Read</th><th>Download Status</th></tr>`;
-                resources.forEach((res, index) => {
-                    let downloadAction = res.allowed 
-                        ? `<button class="success" onclick="window.open('${res.url || '#'}', '_blank')">Download</button>` 
-                        : `<span style="color: gray; font-style: italic;">Locked (Awaiting Admin Permission)</span>`;
-                    
-                    userTable.innerHTML += `<tr>
-                        <td>${res.title}</td>
-                        <td>${res.type}</td>
-                        <td>${res.author}</td>
-                        <td><button onclick="openResource(${index})">Open & Read</button></td>
-                        <td>${downloadAction}</td>
-                    </tr>`;
-                });
+        window.handleUpdateProfile = async function(e) {
+            e.preventDefault();
+            const profileData = {
+                name: document.getElementById('prof-name').value,
+                photo: document.getElementById('prof-photo').value,
+                bio: document.getElementById('prof-bio').value
+            };
+            if (db && currentUser) {
+                try {
+                    await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'adminProfile', 'profile'), profileData);
+                    alert('Admin profile updated successfully!');
+                } catch (err) {
+                    console.error("Profile update error:", err);
+                }
+            } else {
+                document.getElementById('display-admin-name').innerText = profileData.name;
+                document.getElementById('display-admin-bio').innerText = profileData.bio;
+                document.getElementById('display-admin-photo').src = profileData.photo;
+                alert('Profile updated locally!');
             }
+        };
 
-            let adminTable = document.getElementById('adminFilesTable');
-            if(adminTable) {
-                adminTable.innerHTML = `<tr><th>Title</th><th>Type</th><th>Open & Read</th><th>Download Permission</th><th>Actions</th></tr>`;
-                resources.forEach((res, index) => {
-                    let toggleText = res.allowed ? "Revoke Download" : "Allow Download";
-                    let toggleClass = res.allowed ? "danger" : "success";
-                    adminTable.innerHTML += `<tr>
-                        <td>${res.title}</td>
-                        <td>${res.type}</td>
-                        <td><button onclick="openResource(${index})">Open & Read</button></td>
-                        <td>${res.allowed ? "Allowed to Download" : "Restricted"}</td>
-                        <td>
-                            <button class="${toggleClass}" onclick="togglePermission('${res.id}', ${res.allowed})">${toggleText}</button>
-                            <button class="danger" onclick="deleteResource('${res.id}')">Delete</button>
-                        </td>
-                    </tr>`;
-                });
+        window.handleStudentUpload = async function(e) {
+            e.preventDefault();
+            const sub = {
+                name: document.getElementById('sub-name').value,
+                category: document.getElementById('sub-category').value,
+                link: document.getElementById('sub-link').value,
+                desc: document.getElementById('sub-desc').value,
+                date: new Date().toLocaleDateString()
+            };
+            if (db && currentUser) {
+                try {
+                    await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'submissions'), sub);
+                    alert('Assignment submitted successfully to Admin Daniel!');
+                    e.target.reset();
+                } catch (err) {
+                    console.error("Submission error:", err);
+                }
+            } else {
+                submissionsData.unshift({ id: Date.now().toString(), ...sub });
+                renderSubmissions(submissionsData);
+                alert('Assignment submitted successfully!');
+                e.target.reset();
             }
+        };
 
-            let userListUl = document.getElementById('accountList');
-            if(userListUl) {
-                userListUl.innerHTML = "";
-                Object.keys(users).forEach(u => {
-                    userListUl.innerHTML += `<li>Registered Cloud User: ${u}</li>`;
-                });
-            }
-        }
+        // Quiz Engine
+        const quizzes = {
+            math: [
+                { q: "What is the derivative of $f(x) = 3x^2 + 5x - 2$?", options: ["6x + 5", "3x + 5", "6x^2 + 5", "12x"], correct: 0 },
+                { q: "Solve for x: $2x + 8 = 16$", options: ["x = 2", "x = 4", "x = 8", "x = 16"], correct: 1 },
+                { q: "What is the value of $\\sin(90^\\circ)$?", options: ["0", "0.5", "1", "-1"], correct: 2 }
+            ],
+            computer: [
+                { q: "Which component performs arithmetic and logical operations in the CPU?", options: ["Control Unit", "ALU (Arithmetic Logic Unit)", "Registers", "Cache Memory"], correct: 1 },
+                { q: "What does HTML stand for?", options: ["Hyper Text Markup Language", "High Tech Multi Language", "Hyper Transfer Machine Language", "Home Tool Markup Language"], correct: 0 },
+                { q: "In C++, which keyword is used to output data to the console?", options: ["print", "echo", "cout", "printf"], correct: 2 }
+            ]
+        };
 
-        function adminUpload() {
-            let title = document.getElementById('uploadTitle').value.trim();
-            let type = document.getElementById('uploadType').value;
-            let textContentInput = document.getElementById('uploadTextContent').value.trim();
-            let fileInput = document.getElementById('uploadFile');
+        window.startQuiz = function(type) {
+            const qList = quizzes[type];
+            let currentQ = 0;
+            let score = 0;
 
-            if(!title && fileInput.files.length === 0) {
-                alert("Please provide a title or choose a file to upload.");
-                return;
-            }
-
-            if(fileInput.files.length > 0) {
-                let file = fileInput.files[0];
-                let fileSizeMB = file.size / (1024*1024);
-                if(fileSizeMB > 30) {
-                    alert("File size exceeds the 30MB limit!");
+            function renderQ() {
+                if (currentQ >= qList.length) {
+                    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                    document.getElementById('quiz-container').innerHTML = `
+                        <div class="text-center py-10 space-y-6">
+                            <div class="w-20 h-20 rounded-3xl bg-emerald-500 text-white mx-auto flex items-center justify-center shadow-xl">
+                                <i data-lucide="check-circle" class="w-10 h-10"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold">Quiz Completed!</h3>
+                            <p class="text-lg">Your Score: <span class="font-extrabold text-blue-600">${score} / ${qList.length}</span></p>
+                            <button onclick="startQuiz('${type}')" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold">Try Again</button>
+                        </div>
+                    `;
+                    lucide.createIcons();
                     return;
                 }
 
-                if(!title) {
-                    title = file.name;
+                const item = qList[currentQ];
+                document.getElementById('quiz-container').innerHTML = `
+                    <div class="space-y-6">
+                        <div class="flex justify-between items-center text-xs font-semibold text-slate-400">
+                            <span>Question ${currentQ + 1} of ${qList.length}</span>
+                            <span>Score: ${score}</span>
+                        </div>
+                        <h3 class="text-xl font-bold">${item.q}</h3>
+                        <div class="grid grid-cols-1 gap-3">
+                            ${item.options.map((opt, idx) => `
+                                <button onclick="answerQuiz(${idx}, ${item.correct}, '${type}', ${currentQ})" class="w-full text-left p-4 rounded-2xl glass hover:bg-blue-500/10 border border-slate-200 dark:border-slate-800 font-medium text-sm transition-all flex items-center justify-between group">
+                                    <span>${opt}</span>
+                                    <span class="w-6 h-6 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center group-hover:border-blue-500 group-hover:bg-blue-500 group-hover:text-white text-xs">${String.fromCharCode(65 + idx)}</span>
+                                </button>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                lucide.createIcons();
+            }
+
+            window.answerQuiz = function(selected, correct, t, qIdx) {
+                if (selected === correct) {
+                    score++;
+                    confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
                 }
+                currentQ++;
+                renderQ();
+            };
 
-                alert("Uploading file to cloud storage, please wait...");
-                let storageRef = storage.ref('uploads/' + Date.now() + '_' + file.name);
-                storageRef.put(file).then(snapshot => {
-                    snapshot.ref.getDownloadURL().then(downloadURL => {
-                        saveResourceToCloud(title, type, downloadURL, textContentInput || file.name);
-                    });
-                }).catch(error => {
-                    let reader = new FileReader();
-                    reader.onload = function(e) {
-                        saveResourceToCloud(title, type, e.target.result, textContentInput || file.name);
-                    };
-                    reader.readAsDataURL(file);
-                });
-                return;
-            }
+            renderQ();
+        };
 
-            let fileUrl = title;
-            let contentText = textContentInput || "Uploaded study material content.";
-            saveResourceToCloud(title, type, fileUrl, contentText);
-        }
+        // Navigation Switcher
+        window.switchTab = function(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
 
-        function saveResourceToCloud(title, type, fileUrl, contentText) {
-            db.collection("resources").add({
-                title: title,
-                type: type,
-                author: "maalim003",
-                allowed: false,
-                url: fileUrl,
-                contentText: contentText,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                document.getElementById('uploadTitle').value = '';
-                document.getElementById('uploadTextContent').value = '';
-                document.getElementById('uploadFile').value = '';
-                alert("Resource successfully uploaded to cloud and synced across devices!");
-            }).catch(error => {
-                alert("Error saving to database: " + error.message);
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.getAttribute('data-target') === tabName) {
+                    btn.className = "nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/50";
+                } else if (btn.getAttribute('data-target') !== 'admin') {
+                    btn.className = "nav-btn px-3.5 py-2 rounded-lg text-sm font-medium transition-all hover:bg-slate-200/60 dark:hover:bg-slate-800/60 text-slate-600 dark:text-slate-300";
+                }
             });
-        }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
 
-        function togglePermission(docId, currentStatus) {
-            db.collection("resources").doc(docId).update({
-                allowed: !currentStatus
-            }).catch(error => {
-                alert("Error updating permission: " + error.message);
-            });
-        }
+        window.toggleMobileMenu = function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        };
 
-        function deleteResource(docId) {
-            if(confirm("Are you sure you want to delete this resource from the cloud?")) {
-                db.collection("resources").doc(docId).delete().catch(error => {
-                    alert("Error deleting resource: " + error.message);
-                });
-            }
-        }
+        // Initialize Lucide Icons on load
+        window.onload = function() {
+            lucide.createIcons();
+            loadMockData();
+        };
     </script>
 </body>
 </html>
